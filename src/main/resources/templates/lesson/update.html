@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Tworzenie lekcji</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>UTWÓRZ LEKCJE</h1>
+
+<button onclick="location.href='/lessons'">Return</button>
+<button onclick="window.location.href='/'" class="home-button">Home</button>
+
+
+<form th:action="${lesson != null ? '/lessons/update' : '/lessons/create'}" method="post" th:object="${lesson}">
+    <input type="hidden" name="id" th:if="${lesson != null}" th:value="${lesson?.id}"/>
+
+    <input type="datetime-local" name="term" th:value="${lesson != null ? lesson.term : ''}" th:min="${today}" required>
+    <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    </br></br>
+
+<!--    <label>Nauczyciel</label><br>-->
+<!--    <select id="teacherSelectId" name="teacherId" required-->
+<!--            onchange="populateStudents('teacherSelectId', 'studentSelectId')">-->
+<!--        <option value="" disabled>Wybierz nauczyciela</option>-->
+<!--        <option th:each="teacher : ${teachers}" th:value="${teacher.id}"-->
+<!--                th:text="${teacher.firstName} + ' ' + ${teacher.lastName}"-->
+<!--                th:selected="${lesson != null and lesson.teacher != null and lesson.teacher.id == teacher.id}">-->
+<!--        </option>-->
+<!--    </select>-->
+
+<!--    </br></br>-->
+
+<!--    <label>Student</label></br>-->
+<!--    <select id="studentSelectId" name="studentId" required>-->
+<!--        <option value="" disabled>Wybierz studentów</option>-->
+<!--        <option th:each="student : ${students}" th:value="${student.id}"-->
+<!--                th:text="${student.firstName} + ' ' + ${student.lastName}"-->
+<!--                th:selected="${lesson != null and lesson.student != null and lesson.student.id == student.id}">-->
+<!--        </option>-->
+<!--    </select>-->
+
+    </br>
+    </br>
+
+    <button type="submit" th:text="${lesson != null ? 'Update' : 'Create'}">Submit</button>
+</form>
+
+</body>
+</html>
+
+
+<script type="text/javascript">
+
+    function populateStudents(studentSelectorId, teacherSelectorId) {
+        let lSelect = document.getElementById(studentSelectorId);
+        let tSelect = document.getElementById(teacherSelectorId);
+        let url = "/students?teacher=" + lSelect.value;
+        $.getJSON(url, function (teachers) {
+            tSelect.innerHTML = '<option value="" disabled selected>Wybierz studentów</option>';
+            teachers.forEach(teacher => {
+                let option = '<option value="' + teacher.id + '">' + teacher.firstName + ' ' + teacher.lastName + '</option>';
+                tSelect.innerHTML += option;
+            })
+        })
+    }
+
+
+</script>
