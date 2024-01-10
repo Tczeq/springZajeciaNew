@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>pl.szlify</groupId>
-    <artifactId>coding</artifactId>
+    <artifactId>springZajeciaNew</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>coding</name>
     <description>coding</description>

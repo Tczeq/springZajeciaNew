@@ -87,15 +87,6 @@ class StudentServiceTest {
         when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
 
         //when //then
-//        EntityNotFoundException exception = assertThrows(
-//                EntityNotFoundException.class, () -> studentService.create(toSave, teacherId));
-//        assertEquals(exceptionMsg, exception.getMessage());
-
-//        assertThrows(
-//                EntityNotFoundException.class,
-//                () -> studentService.create(toSave, teacherId),
-//                exceptionMsg);
-
         assertThatExceptionOfType(EntityNotFoundException.class)
                 .isThrownBy(() -> studentService.create(toSave, teacherId))
                 .withMessage(exceptionMsg);
@@ -108,6 +99,7 @@ class StudentServiceTest {
     void testCreate_LanguageMismatch_ResultsInLanguageMismatchException() {
         //given
         int teacherId = 2;
+        String exceptionMsg = MessageFormat.format("Language for teacher with id={0} not found", teacherId);
         Student toSave = Student.builder()
                 .language(Language.JAVA)
                 .build();
@@ -119,7 +111,7 @@ class StudentServiceTest {
         //when //then
         assertThatExceptionOfType(LanguageMismatchException.class)
                 .isThrownBy(() -> studentService.create(toSave, teacherId))
-                .withMessage(null); //todo: wypadałoby coś jednak zwracać jako komunikat
+                .withMessage(exceptionMsg);
 
         verify(teacherRepository).findById(teacherId);
         verifyNoInteractions(studentRepository);
@@ -236,36 +228,6 @@ class StudentServiceTest {
         assertEquals(studentDto.getLastName(), actualStudents.get(0).getLastName());
     }
 
-//    @Test
-//    void testFindStudentByTeacher_StudentNotFound_ResultsInStudentNotFound() {
-//        //given
-//        int teacherId = 3;
-//        Student toFind = Student.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .languages(Set.of(toFind.getLanguage()))
-//                .build();
-//
-//        List<Student> students = List.of(toFind);
-//
-//
-//        when(studentRepository.findAllByTeacher(teacher)).thenReturn(Collections.EMPTY_LIST);
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(teacher));
-//
-//        //when
-//        List<StudentDto> actualStudents = studentService.findStudentsByTeacher(teacherId);
-//
-//        //then
-//        verify(studentRepository).findAllByTeacher(teacher);
-//        verify(teacherRepository).findById(teacherId);
-//        assertTrue(actualStudents.isEmpty());
-//        assertNotEquals(students, actualStudents);
-//    }
-
 
     @Test
     void testDeleteById_HappyPath_ResultsInStudentDeleted() {
@@ -315,24 +277,4 @@ class StudentServiceTest {
         verify(studentRepository).findAll();
         assertEquals(studentsFromRepo, actualStudents);
     }
-
-
-//    @Test
-//    void testFindAll_NotFoundAll_ResultsInStudentNotFoundAllStudents() {
-//        //given
-//        Student toFind = Student.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//
-//        when(studentRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
-//
-//        //when
-//        List<Student> actualStudents = studentService.findAll();
-//
-//        //then
-//        verify(studentRepository).findAll();
-//        assertNotEquals(List.of(toFind), actualStudents);
-//    }
 }

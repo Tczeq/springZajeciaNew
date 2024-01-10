@@ -30,7 +30,8 @@ public class StudentService {
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat
                         .format("Teacher with id={0} not found", teacherId)));
         if (!teacher.getLanguages().contains(student.getLanguage())) {
-            throw new LanguageMismatchException();
+            throw new LanguageMismatchException(MessageFormat
+                    .format("Language for teacher with id={0} not found", teacherId));
         }
         student.setTeacher(teacher);
         studentRepository.save(student);

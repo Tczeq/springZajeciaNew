@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.szlify.coding.common.Language;
 import pl.szlify.coding.teacher.model.Teacher;
+import pl.szlify.coding.teacher.model.command.CreateTeacherCommand;
+import pl.szlify.coding.teacher.model.command.UpdateTeacherCommand;
 import pl.szlify.coding.teacher.model.dto.TeacherDto;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -16,24 +19,23 @@ public class TeacherService {
 
     private final TeacherRepository teacherRepository;
 
-    public List<Teacher> findAll() {
-        return teacherRepository.findAll();
+    public List<TeacherDto> findAll() {
+        return teacherRepository.findAll().stream()
+                .map(TeacherDto::fromEntity)
+                .toList();
     }
 
-
-    @Transactional
-    public void create(Teacher teacher) {
-        teacherRepository.save(teacher);
+    public TeacherDto create(CreateTeacherCommand command) {
+        Teacher teacher = command.toEntity();
+        return TeacherDto.fromEntity(teacherRepository.save(teacher));
     }
-
 
     @Transactional
     public void deleteById(int idToDelete) {
         teacherRepository.deleteById(idToDelete);
     }
 
-
-//    public List<Teacher> findAllByLanguage(Language language) {
+    //    public List<Teacher> findAllByLanguage(Language language) {
 //        return teacherRepository.findAllByLanguagesContaining(language);
 //    }
     public List<TeacherDto> findAllByLanguage(Language language) {
@@ -64,15 +66,29 @@ public class TeacherService {
 
 
     @Transactional
-    public void update(Teacher updatedTeacher) {
-        Teacher existingTeacher = teacherRepository.findWithLockingById(updatedTeacher.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Teacher with id=" + updatedTeacher.getId() + " not found"));
+    public TeacherDto update(int id, UpdateTeacherCommand command) {
+        Teacher teacher = teacherRepository.findWithLockingById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Teacher with id={0} not found", id)));
 
-        existingTeacher.setFirstName(updatedTeacher.getFirstName());
-        existingTeacher.setLastName(updatedTeacher.getLastName());
-        existingTeacher.setLanguages(updatedTeacher.getLanguages());
+        if (command.getFirstName() != null) {
+            teacher.setFirstName(command.getFirstName());
+        }
+        if (command.getLastName() != null) {
+            teacher.setLastName(command.getLastName());
+        }
+        if (command.getLanguages() != null) {
+            teacher.setLanguages(command.getLanguages());
+        }
 
-        teacherRepository.save(existingTeacher);
+//        teacherRepository.save(teacher);
+        return TeacherDto.fromEntity(teacher);
     }
 
+    public TeacherDto findById(int id) {
+        return teacherRepository.findById(id)
+                .map(TeacherDto::fromEntity)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Teacher with id={0} not found", id)));
+    }
 }
