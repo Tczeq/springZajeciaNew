@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.szlify.coding.common.exception.LanguageMismatchException;
+import pl.szlify.coding.student.command.CreateStudentCommand;
+import pl.szlify.coding.student.command.UpdateStudentCommand;
 import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.student.model.dto.StudentDto;
 import pl.szlify.coding.teacher.TeacherRepository;
 import pl.szlify.coding.teacher.model.Teacher;
+import pl.szlify.coding.teacher.model.dto.TeacherDto;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -20,12 +23,17 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
 
-    public List<Student> findAll(){
-        return studentRepository.findAll();
+    public List<StudentDto> findAll(){
+        return studentRepository.findAll().stream()
+                .map(StudentDto::fromEntity)
+                .toList();
     }
 
-    @Transactional
-    public void create(Student student, int teacherId){
+    public StudentDto create(CreateStudentCommand command, int teacherId){
+
+        Student student = command.toEntity();
+
+
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat
                         .format("Teacher with id={0} not found", teacherId)));
@@ -34,43 +42,41 @@ public class StudentService {
                     .format("Language for teacher with id={0} not found", teacherId));
         }
         student.setTeacher(teacher);
-        studentRepository.save(student);
+
+        return StudentDto.fromEntity(studentRepository.save(student));
     }
 
     public List<StudentDto> findStudentsByTeacher(int teacherId) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new EntityNotFoundException("Teacher with id=" + teacherId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Teacher with id={0} not found", teacherId)));
         return studentRepository.findAllByTeacher(teacher).stream()
                 .map(StudentDto::fromEntity)
                 .toList();
     }
 
-
-
     @Transactional
-    public void deleteById(int idToDelete) {
-        studentRepository.deleteById(idToDelete);
+    public void deleteById(int id) {
+        studentRepository.deleteById(id);
     }
 
-    public Student findById(int studentId) {
-        return studentRepository.findById(studentId)
-                .orElseThrow(() -> new EntityNotFoundException("Student with id=" + studentId + " not found"));
+    public Student findById(int id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Student with id={0} not found", id)));
     }
 
-
-//    @Transactional
-//    public void deleteStudent(int studentId){
-//        Student student = findStudentById(studentId);
-//        student.setDeleted(true);
-//        studentRepository.save(student);
-//
-//    }
-
-
     @Transactional
-    public void bringBackStudent(int studentId) {
-        Student student = findById(studentId);
-        student.setDeleted(false);
-        studentRepository.save(student);
+    public StudentDto update(int id, UpdateStudentCommand command) {
+        Student student = studentRepository.findWithLockingById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Student with id={0} not found", id)));
+        if(command.getFirstName() != null) {
+            student.setFirstName(command.getFirstName());
+        }
+        if(command.getLastName() != null){
+            student.setLastName(command.getLastName());
+        }
+        return StudentDto.fromEntity(student);
     }
 }

@@ -1,0 +1,27 @@
+package pl.szlify.coding.student.command;
+
+import lombok.Builder;
+import lombok.Data;
+import pl.szlify.coding.common.Language;
+import pl.szlify.coding.student.model.Student;
+import pl.szlify.coding.teacher.model.Teacher;
+
+@Data
+@Builder
+public class CreateStudentCommand {
+
+    private String firstName;
+    private String lastName;
+    private Language language;
+    private Teacher teacher;
+    private int teacherId;
+
+    public Student toEntity() {
+        return Student.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .language(language)
+                .teacher(teacher)
+                .build();
+    }
+}

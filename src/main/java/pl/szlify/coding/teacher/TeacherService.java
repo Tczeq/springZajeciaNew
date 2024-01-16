@@ -24,45 +24,28 @@ public class TeacherService {
                 .map(TeacherDto::fromEntity)
                 .toList();
     }
-
     public TeacherDto create(CreateTeacherCommand command) {
         Teacher teacher = command.toEntity();
         return TeacherDto.fromEntity(teacherRepository.save(teacher));
     }
-
     @Transactional
     public void deleteById(int idToDelete) {
-        teacherRepository.deleteById(idToDelete);
-    }
+        Teacher teacher = teacherRepository.findWithLockingById(idToDelete)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Teacher with id={0} not found", idToDelete)));
 
-    //    public List<Teacher> findAllByLanguage(Language language) {
-//        return teacherRepository.findAllByLanguagesContaining(language);
-//    }
+        teacher.setDeleted(true);
+        teacherRepository.save(teacher);
+    }
     public List<TeacherDto> findAllByLanguage(Language language) {
         return teacherRepository.findAllByLanguagesContaining(language).stream()
                 .map(TeacherDto::fromEntity)
                 .toList();
     }
-
-    public Teacher findTeacherById(int teacherId) {
-        return teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new EntityNotFoundException("Teacher with id=" + teacherId + " not found"));
-    }
-
-    @Transactional
-    public void fireTeacher(int teacherId) {
-        Teacher teacher = findTeacherById(teacherId);
-        teacher.setFired(true);
-        teacherRepository.save(teacher);
-
-    }
-
-    @Transactional
-    public void hireTeacher(int teacherId) {
-        Teacher teacher = findTeacherById(teacherId);
-        teacher.setFired(false);
-        teacherRepository.save(teacher);
-    }
+//    public Teacher findTeacherById(int teacherId) {
+//        return teacherRepository.findById(teacherId)
+//                .orElseThrow(() -> new EntityNotFoundException("Teacher with id=" + teacherId + " not found"));
+//    }
 
 
     @Transactional
@@ -85,10 +68,13 @@ public class TeacherService {
         return TeacherDto.fromEntity(teacher);
     }
 
+
+    // CTRL + ALT + N -> Inline variable
     public TeacherDto findById(int id) {
         return teacherRepository.findById(id)
                 .map(TeacherDto::fromEntity)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat
                         .format("Teacher with id={0} not found", id)));
     }
+
 }

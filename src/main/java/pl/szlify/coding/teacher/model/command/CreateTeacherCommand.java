@@ -9,6 +9,7 @@ import java.util.Set;
 @Data
 public class CreateTeacherCommand {
 
+
     private String firstName;
     private String lastName;
     private Set<Language> languages;

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 //@SQLDelete(sql = "UPDATE lesson SET deleted = 1 WHERE id = ?")
 @SQLDelete(sql = "UPDATE lesson SET deleted = 1 WHERE id = ? AND deleted = ?")
-@Where(clause = "deleted = false")
+//@Where(clause = "deleted = false")
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,5 +39,5 @@ public class Lesson {
     private Integer version;
 
     @Column(name = "deleted")
-    private boolean isDeleted = false;
+    private Boolean isDeleted = false;
 }

@@ -23,7 +23,7 @@ import java.util.Set;
 
 @SQLDelete(sql = "UPDATE teacher SET deleted = 1, version = version + 1 WHERE id = ? AND version = ?")
 
-@Where(clause = "deleted = false") // tutaj ustawiamy gdy chcemy wyswietlic tylko tych ktorzy sa zatudnieni albo nie
+//@Where(clause = "deleted = false") // tutaj ustawiamy gdy chcemy wyswietlic tylko tych ktorzy sa zatudnieni albo nie
 public class Teacher {
 
     @Id
@@ -48,8 +48,8 @@ public class Teacher {
     @Column(name = "deleted")
     private boolean deleted = false;
 
-    @Column(name = "fired")
-    private boolean fired = false;
+//    @Column(name = "fired")
+//    private boolean fired = false;
 
     @Override
     public String toString() {

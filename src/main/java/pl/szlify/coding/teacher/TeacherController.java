@@ -1,10 +1,8 @@
 package pl.szlify.coding.teacher;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.szlify.coding.common.Language;
-import pl.szlify.coding.teacher.model.Teacher;
 import pl.szlify.coding.teacher.model.command.CreateTeacherCommand;
 import pl.szlify.coding.teacher.model.command.UpdateTeacherCommand;
 import pl.szlify.coding.teacher.model.dto.TeacherDto;
@@ -45,36 +43,30 @@ public class TeacherController {
         return teacherService.update(id, command);
     }
 
-    //#####################################################################
-
-
-
-
-
-
-    @DeleteMapping
-    public void teacherIdToDelete(@RequestParam int teacherIdToDelete) {
-        teacherService.deleteById(teacherIdToDelete);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable int id) {
+        teacherService.deleteById(id);
     }
 
-
     @GetMapping(params = "language")
-    public List<TeacherDto> getAll(@RequestParam Language language) {
+    public List<TeacherDto> getAll(@RequestParam("language") Language language) {
         return teacherService.findAllByLanguage(language);
     }
 
+    //#####################################################################
 
-    @PutMapping("/fire/{id}")
-    public String firedTeacherById(@PathVariable("id") int teacherId) {
-        teacherService.fireTeacher(teacherId);
-        return "redirect:/teachers";
-    }
 
-    @PutMapping("/hire/{id}")
-    public String hiredTeacherById(@PathVariable("id") int teacherId) {
-        teacherService.hireTeacher(teacherId);
-        return "redirect:/teachers";
-    }
+//    @PutMapping("/fire/{id}")
+//    public String firedTeacherById(@PathVariable("id") int teacherId) {
+//        teacherService.fireTeacher(teacherId);
+//        return "redirect:/teachers";
+//    }
+//
+//    @PutMapping("/hire/{id}")
+//    public String hiredTeacherById(@PathVariable("id") int teacherId) {
+//        teacherService.hireTeacher(teacherId);
+//        return "redirect:/teachers";
+//    }
 
 
 }
