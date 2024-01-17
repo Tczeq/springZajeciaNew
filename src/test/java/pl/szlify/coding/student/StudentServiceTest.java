@@ -1,6 +1,5 @@
 package pl.szlify.coding.student;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -9,19 +8,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.szlify.coding.common.Language;
-import pl.szlify.coding.common.exception.LanguageMismatchException;
-import pl.szlify.coding.student.command.CreateStudentCommand;
+import pl.szlify.coding.student.model.command.CreateStudentCommand;
 import pl.szlify.coding.student.model.Student;
-import pl.szlify.coding.student.model.dto.StudentDto;
 import pl.szlify.coding.teacher.TeacherRepository;
 import pl.szlify.coding.teacher.model.Teacher;
 
-import java.text.MessageFormat;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;

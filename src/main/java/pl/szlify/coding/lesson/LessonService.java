@@ -31,25 +31,6 @@ public class LessonService {
                 .toList();
     }
 
-//    @Transactional
-//    public void create(Lesson lesson, int teacherId, int studentId) {
-//        LocalDateTime term = lesson.getTerm();
-//        if (term.isBefore(LocalDateTime.now())) {
-//            throw new InvalidDate("Term cannot be from the past ");
-//        }
-//        Teacher teacher = teacherRepository.findWithLockingById(teacherId)
-//                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-//                        .format("Teacher with id={0} not found", teacherId)));
-//        if (lessonRepository.existsByTeacherIdAndTermAfterAndTermBefore(teacherId, term.minusHours(1), term.plusHours(1))) {
-//            throw new InvalidDate("Term unavailable");
-//        }
-//        Student student = studentRepository.findById(studentId)
-//                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-//                        .format("Student with id={0} not found", studentId)));
-//        lesson.setStudent(student);
-//        lesson.setTeacher(teacher);
-//        lessonRepository.save(lesson);
-//    }
 
     @Transactional
     public LessonDto create(CreateLessonCommand command, int teacherId, int studentId) {

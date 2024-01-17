@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.szlify.coding.common.Language;
 import pl.szlify.coding.teacher.model.Teacher;
+import pl.szlify.coding.teacher.model.command.CreateTeacherCommand;
+import pl.szlify.coding.teacher.model.command.UpdateTeacherCommand;
 import pl.szlify.coding.teacher.model.dto.TeacherDto;
 
 import java.text.MessageFormat;
@@ -18,10 +20,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Collections.EMPTY_LIST;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TeacherServiceTest {
@@ -44,15 +47,16 @@ class TeacherServiceTest {
                 .languages(Set.of(Language.JAVA, Language.JS))
                 .build();
 
+
         when(teacherRepository.findAll()).thenReturn(List.of(toFind));
 
-        // fixme
         //when
-//        List<Teacher> actualStudents = teacherService.findAll();
+        List<TeacherDto> actualStudents = teacherService.findAll();
 
         //then
-//        verify(teacherRepository).findAll();
-//        assertEquals(List.of(toFind), actualStudents);
+        verify(teacherRepository).findAll();
+        TeacherDto expectedTeacherDto = TeacherDto.fromEntity(toFind);
+        assertEquals(List.of(expectedTeacherDto), actualStudents);
     }
 
 
@@ -65,258 +69,153 @@ class TeacherServiceTest {
                 .languages(Set.of(Language.JAVA, Language.JS))
                 .build();
 
-        when(teacherRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
+        when(teacherRepository.findAll()).thenReturn(EMPTY_LIST);
 
-        // fixme
         //when
-//        List<Teacher> actualTeachers = teacherService.findAll();
+        List<TeacherDto> actualTeachers = teacherService.findAll();
 
         //then
-//        verify(teacherRepository).findAll();
-//        assertNotEquals(List.of(toFind), actualTeachers);
+        verify(teacherRepository).findAll();
+        TeacherDto expected = TeacherDto.fromEntity(toFind);
+        assertNotEquals(List.of(expected), actualTeachers);
     }
 
-    @Test
-    void testCreate_HappyPath_ResultsInTeacherBeingSaved() {
-        //given
-        Teacher toSave = Teacher.builder()
-                .firstName("Test")
-                .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.JS))
-                .build();
+//    @Test
+//    void testCreate_HappyPath_ResultsInTeacherBeingSaved() {
+//        //given
+//        CreateTeacherCommand command = CreateTeacherCommand.builder()
+//                .firstName("Test")
+//                .lastName("Testowy")
+//                .languages(Set.of(Language.JAVA, Language.JS))
+//                .build();
+//
+//        Teacher toSave = command.toEntity();
+//
+//        //when
+//        TeacherDto teacherDto = teacherService.create(command);
+//
+//        //then
+//
+//        verify(teacherRepository).save(teacherArgumentCaptor.capture());
+//        Teacher saved = teacherArgumentCaptor.getValue();
+//        assertEquals(toSave.getFirstName(), saved.getFirstName());
+//        assertEquals(toSave.getLastName(), saved.getLastName());
+//        assertEquals(toSave.getLanguages(), saved.getLanguages());
+//        assertEquals(toSave, saved);
 
-        //fixme
-        //when
-//        teacherService.create(toSave);
 
-        //then
+//    }
 
-        verify(teacherRepository).save(teacherArgumentCaptor.capture());
-        Teacher saved = teacherArgumentCaptor.getValue();
-        assertEquals(toSave.getFirstName(), saved.getFirstName());
-        assertEquals(toSave.getLastName(), saved.getLastName());
-        assertEquals(toSave.getLanguages(), saved.getLanguages());
-        assertEquals(toSave, saved);
-    }
 
 
     @Test
     void testDeleteById_HappyPath_ResultsInTeacherFound() {
         //give
         int teacherId = 3;
-        //when
-        teacherService.deleteById(teacherId);
-        //then
-        verify(teacherRepository).deleteById(teacherId);
+        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
+        //when
+        assertThatExceptionOfType(EntityNotFoundException.class)
+                .isThrownBy(() -> teacherService.deleteById(teacherId))
+                .withMessage(exceptionMsg);
+
+        verify(teacherRepository).findWithLockingById(teacherId);
     }
 
-//    @Test
-//    void testDeleteById_TeacherNotFoundById_ResultsInEntityNotFoundException() {
-//        //given
-//        int teacherId = 3;
-//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
-//
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
-//
-//        //when
-//        teacherService.deleteById(teacherId);
-//
-//        assertThatExceptionOfType(EntityNotFoundException.class)
-//                .isThrownBy(() -> teacherService.findTeacherById(teacherId))
-//                .withMessage(exceptionMsg);
-//
-//        //then
-//        verify(teacherRepository).deleteById(teacherId);
-//
-//    }
-//
-//
-//    @Test
-//    void testFindTeachersByLanguages_HappyPath_ResultsInTeachersFound() {
-//        //given
-//        Teacher toFind = Teacher.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(Language.JAVA, Language.JS))
-//                .build();
-//        Language language = Language.JAVA;
-//
-//        List<Teacher> teachers = List.of(toFind);
-//
-//        when(teacherRepository.findAllByLanguagesContaining(language)).thenReturn(teachers);
-//
-//        //when
-//        List<TeacherDto> actualTeachers = teacherService.findAllByLanguage(language);
-//        List<TeacherDto> expectedTeachers = teachers.stream()
-//                .map(TeacherDto::fromEntity)
-//                .toList();
-//
-//
-//        //then
-//        verify(teacherRepository).findAllByLanguagesContaining(language);
-//        assertEquals(expectedTeachers, actualTeachers);
-//    }
-//
-//    @Test
-//    void testFindTeachersByLanguages_TeacherNotFoundByLanguages_ResultsInTeachersNotFound() {
-//        // given
-//        Language language = Language.JAVA;
-//
-//        when(teacherRepository.findAllByLanguagesContaining(language)).thenReturn(Collections.emptyList());
-//
-//        // when
-//        List<TeacherDto> actualTeachers = teacherService.findAllByLanguage(language);
-//
-//        // then
-//        verify(teacherRepository).findAllByLanguagesContaining(language);
-//        assertTrue(actualTeachers.isEmpty());
-//    }
-//
-//
-//    @Test
-//    void testFindTeacherById_HappyPath_ResultsInTeacherFound() {
-//        //given
-//        int teacherId = 3;
-//        Teacher toFind = Teacher.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(Language.JAVA, Language.JS))
-//                .build();
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(toFind));
-//
-//        //when
-//        teacherService.findTeacherById(teacherId);
-//
-//        //then
-//        verify(teacherRepository).findById(teacherId);
-//    }
-//
-//    @Test
-//    void testFindTeacherById_TeacherNotFound_ResultsInEntityNotFoundException() {
-//        //given
-//        int teacherId = 3;
-//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
-//
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
-//
-////        //then
-////        assertThrows(EntityNotFoundException.class, () -> {
-////            //when
-////            teacherService.findTeacherById(teacherId);
-////        });
-//
-//        //when //then
-//        assertThatExceptionOfType(EntityNotFoundException.class)
-//                .isThrownBy(() -> teacherService.findTeacherById(teacherId))
-//                .withMessage(exceptionMsg);
-//    }
+    @Test
+    void testDeleteById_TeacherNotFoundById_ResultsInEntityNotFoundException() {
+        //given
+        int teacherId = 3;
+        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
+        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.empty());
 
-//    @Test
-//    void testFireTeacher_HappyPath_ResultsInTeacherFire() {
-//        //given
-//        int teacherId = 3;
-//        Teacher toFind = Teacher.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(Language.JAVA, Language.JS))
-//                .build();
-//
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(toFind));
-//
-//        //when
-//
-//        teacherService.fireTeacher(teacherId);
-//
-//
-//        //then
-//        verify(teacherRepository).findById(teacherId);
-//        verify(teacherRepository).save(teacherArgumentCaptor.capture());
-//        Teacher saved = teacherArgumentCaptor.getValue();
-//
-//
-//        assertEquals(toFind.getFirstName(), saved.getFirstName());
-//        assertEquals(toFind.getLastName(), saved.getLastName());
-//        assertEquals(toFind.getLanguages(), saved.getLanguages());
-//        assertEquals(toFind.getStudents(), saved.getStudents());
-//        assertTrue(saved.isFired());
-//    }
-//
-//
-//    @Test
-//    void testFireTeacher_TeacherNotFound_ResultsInEntityNotFoundException() {
-//        //given
-//        int teacherId = 3;
-//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
-//
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
-//
-////        //then
-////        assertThrows(EntityNotFoundException.class, () -> {
-////            //when
-////            teacherService.fireTeacher(teacherId);
-////        });
-//
-//        //when //then
-//        assertThatExceptionOfType(EntityNotFoundException.class)
-//                .isThrownBy(() -> teacherService.fireTeacher(teacherId))
-//                .withMessage(exceptionMsg);
-//    }
-//
-//
-//    @Test
-//    void testHireTeacher_HappyPath_ResultsInTeacherHire() {
-//        int teacherId = 3;
-//        Teacher toFind = Teacher.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(Language.JAVA, Language.JS))
-//                .build();
-//
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(toFind));
-//
-//        teacherService.hireTeacher(teacherId);
-//
-//
-//        verify(teacherRepository).findById(teacherId);
-//        verify(teacherRepository).save(teacherArgumentCaptor.capture());
-//        Teacher saved = teacherArgumentCaptor.getValue();
-//
-//
-//        assertEquals(toFind.getFirstName(), saved.getFirstName());
-//        assertEquals(toFind.getLastName(), saved.getLastName());
-//        assertEquals(toFind.getLanguages(), saved.getLanguages());
-//        assertEquals(toFind.getStudents(), saved.getStudents());
-//        assertFalse(saved.isFired());
-//    }
-//
-//
-//    @Test
-//    void testHireTeacher_TeacherNotFound_ResultsInEntityNotFoundException() {
-//        //given
-//        int teacherId = 3;
-//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
-//
-//        when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
-//
-////        //then
-////        assertThrows(EntityNotFoundException.class, () -> {
-////            //when
-////            teacherService.hireTeacher(teacherId);
-////        });
-//
-//
-//        //when //then
-//        assertThatExceptionOfType(EntityNotFoundException.class)
-//                .isThrownBy(() -> teacherService.fireTeacher(teacherId))
-//                .withMessage(exceptionMsg);
-//    }
+        //when
+        assertThatExceptionOfType(EntityNotFoundException.class)
+                .isThrownBy(() -> teacherService.deleteById(teacherId))
+                .withMessage(exceptionMsg);
+        verify(teacherRepository).findWithLockingById(teacherId);
+    }
 
 
     @Test
-    void testUpdate_HappyPath_ResultsInStudentBeingUpdated() {
+    void testFindTeachersByLanguages_HappyPath_ResultsInTeachersFound() {
         //given
+        Teacher toFind = Teacher.builder()
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(Language.JAVA, Language.JS))
+                .build();
+        Language language = Language.JAVA;
+
+        List<Teacher> teachers = List.of(toFind);
+
+        when(teacherRepository.findAllByLanguagesContaining(language)).thenReturn(teachers);
+
+        //when
+        List<TeacherDto> actualTeachers = teacherService.findAllByLanguage(language);
+        List<TeacherDto> expectedTeachers = teachers.stream()
+                .map(TeacherDto::fromEntity)
+                .toList();
+
+        //then
+        verify(teacherRepository).findAllByLanguagesContaining(language);
+        assertEquals(expectedTeachers, actualTeachers);
+    }
+
+    @Test
+    void testFindTeachersByLanguages_TeacherNotFoundByLanguages_ResultsInTeachersNotFound() {
+        // given
+        Language language = Language.JAVA;
+
+        when(teacherRepository.findAllByLanguagesContaining(language)).thenReturn(Collections.emptyList());
+
+        // when
+        List<TeacherDto> actualTeachers = teacherService.findAllByLanguage(language);
+
+        // then
+        verify(teacherRepository).findAllByLanguagesContaining(language);
+        assertTrue(actualTeachers.isEmpty());
+    }
+
+
+    @Test
+    void testFindTeacherById_HappyPath_ResultsInTeacherFound() {
+        //given
+        int teacherId = 3;
+        Teacher toFind = Teacher.builder()
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(Language.JAVA, Language.JS))
+                .build();
+        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(toFind));
+
+        //when
+        teacherService.findById(teacherId);
+
+        //then
+        verify(teacherRepository).findById(teacherId);
+    }
+
+    @Test
+    void testFindTeacherById_TeacherNotFound_ResultsInEntityNotFoundException() {
+        //given
+        int teacherId = 3;
+        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
+
+        when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
+
+        //when //then
+        assertThatExceptionOfType(EntityNotFoundException.class)
+                .isThrownBy(() -> teacherService.findById(teacherId))
+                .withMessage(exceptionMsg);
+        verify(teacherRepository).findById(teacherId);
+    }
+
+
+    @Test
+    void testUpdate_HappyPath_ResultsInTeacherBeingUpdated() {
+        // given
         int teacherId = 3;
 
         Teacher actualTeacher = Teacher.builder()
@@ -326,29 +225,29 @@ class TeacherServiceTest {
                 .languages(Set.of(Language.C, Language.JS))
                 .build();
 
-        Teacher toSave = Teacher.builder()
-                .id(teacherId)
+        UpdateTeacherCommand toSave = UpdateTeacherCommand.builder()
                 .firstName("Test2")
                 .lastName("Testowy2")
                 .languages(Set.of(Language.JAVA, Language.PYTHON))
                 .build();
 
-
         when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.of(actualTeacher));
 
-        //fixme
-        //when
-//        teacherService.update(toSave);
+        // when
+        TeacherDto updatedTeacherDto = teacherService.update(teacherId, toSave);
 
-        //then
+        // then
         verify(teacherRepository).findWithLockingById(teacherId);
-        verify(teacherRepository).save(teacherArgumentCaptor.capture());
 
-        Teacher saved = teacherArgumentCaptor.getValue();
-        assertEquals(toSave.getFirstName(), saved.getFirstName());
-        assertEquals(toSave.getLastName(), saved.getLastName());
-        assertEquals(toSave.getLanguages(), saved.getLanguages());
-        assertEquals(teacherId, saved.getId());
+        actualTeacher.setFirstName(toSave.getFirstName());
+        actualTeacher.setLastName(toSave.getLastName());
+        actualTeacher.setLanguages(toSave.getLanguages());
+
+        assertEquals(actualTeacher.getId(), updatedTeacherDto.getId());
+        assertEquals(actualTeacher.getFirstName(), updatedTeacherDto.getFirstName());
+        assertEquals(actualTeacher.getLastName(), updatedTeacherDto.getLastName());
+        assertEquals(actualTeacher.getLanguages(), updatedTeacherDto.getLanguages());
+        assertEquals(actualTeacher.isDeleted(), updatedTeacherDto.isDeleted());
     }
 
     @Test
@@ -357,8 +256,7 @@ class TeacherServiceTest {
         int teacherId = 3;
         String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
-        Teacher toUpdate = Teacher.builder()
-                .id(teacherId)
+        UpdateTeacherCommand toSave = UpdateTeacherCommand.builder()
                 .firstName("Test2")
                 .lastName("Testowy2")
                 .languages(Set.of(Language.JAVA, Language.PYTHON))
@@ -367,17 +265,11 @@ class TeacherServiceTest {
 
         when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.empty());
 
-//        //then
-//        assertThrows(EntityNotFoundException.class, () -> {
-//            //when
-//            teacherService.update(toUpdate);
-//        });
-
-        //fixme
         //when //then
-//        assertThatExceptionOfType(EntityNotFoundException.class)
-//                .isThrownBy(() -> teacherService.update(toUpdate))
-//                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(EntityNotFoundException.class)
+                .isThrownBy(() -> teacherService.update(teacherId, toSave))
+                .withMessage(exceptionMsg);
+        verify(teacherRepository).findWithLockingById(teacherId);
     }
 
 

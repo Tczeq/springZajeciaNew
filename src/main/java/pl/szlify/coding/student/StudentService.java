@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.szlify.coding.common.exception.LanguageMismatchException;
-import pl.szlify.coding.student.command.CreateStudentCommand;
-import pl.szlify.coding.student.command.UpdateStudentCommand;
+import pl.szlify.coding.student.model.command.CreateStudentCommand;
+import pl.szlify.coding.student.model.command.UpdateStudentCommand;
 import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.student.model.dto.StudentDto;
 import pl.szlify.coding.teacher.TeacherRepository;
 import pl.szlify.coding.teacher.model.Teacher;
-import pl.szlify.coding.teacher.model.dto.TeacherDto;
 
 import java.text.MessageFormat;
 import java.util.List;

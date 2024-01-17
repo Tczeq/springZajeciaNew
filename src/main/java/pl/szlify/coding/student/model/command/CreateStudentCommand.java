@@ -1,4 +1,4 @@
-package pl.szlify.coding.student.command;
+package pl.szlify.coding.student.model.command;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,5 +1,6 @@
 package pl.szlify.coding.teacher;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.szlify.coding.common.Language;
@@ -34,12 +35,12 @@ public class TeacherController {
     }
 
     @PostMapping
-    public TeacherDto create(@RequestBody CreateTeacherCommand command) {
+    public TeacherDto create(@Valid @RequestBody CreateTeacherCommand command) {
         return teacherService.create(command);
     }
 
     @PutMapping("/{id}")
-    public TeacherDto updateTeacher(@PathVariable int id, @RequestBody UpdateTeacherCommand command) {
+    public TeacherDto updateTeacher(@PathVariable int id, @Valid @RequestBody UpdateTeacherCommand command) {
         return teacherService.update(id, command);
     }
 

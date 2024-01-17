@@ -3,8 +3,8 @@ package pl.szlify.coding.student;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import pl.szlify.coding.student.command.CreateStudentCommand;
-import pl.szlify.coding.student.command.UpdateStudentCommand;
+import pl.szlify.coding.student.model.command.CreateStudentCommand;
+import pl.szlify.coding.student.model.command.UpdateStudentCommand;
 import pl.szlify.coding.student.model.dto.StudentDto;
 
 import java.util.List;

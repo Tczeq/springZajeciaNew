@@ -1,6 +1,7 @@
 package pl.szlify.coding.lesson.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -27,6 +28,7 @@ public class Lesson {
 //jQuery - wybieramy nauczyciela i przeladowuje nam studentow dla danego anuczyciela
     //Asocjacja
     //walidacja lekcji
+
     private LocalDateTime term;
 
     @ManyToOne
