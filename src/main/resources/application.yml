@@ -2,6 +2,10 @@ spring:
 #  jpa:
 #    hibernate:
 #      ddl-auto: update
+  security:
+    user:
+      name: root
+      password: root
   datasource:
     url: jdbc:mysql://localhost:3306/szkola
     username: root

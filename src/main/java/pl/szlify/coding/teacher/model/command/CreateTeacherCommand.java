@@ -25,11 +25,12 @@ public class CreateTeacherCommand {
     @NotEmpty(message = "At least one language")
     private Set<Language> languages;
 
+
     public Teacher toEntity() {
         return Teacher.builder()
                 .firstName(firstName)
                 .lastName(lastName)
-                .languages(languages)
+                .languages(languages )
                 .build();
     }
 }
