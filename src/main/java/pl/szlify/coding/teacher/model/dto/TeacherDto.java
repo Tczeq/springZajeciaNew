@@ -19,6 +19,7 @@ public class TeacherDto {
     private boolean deleted;
     //    private boolean fired;
     private String url;
+    private String deleteUrl;
 
     public static TeacherDto fromEntity(Teacher teacher) {
         return TeacherDto.builder()

@@ -37,18 +37,18 @@ public class TeacherController {
 
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAll() {
-        List<TeacherDto> all = teacherService.findAll();
+        List<TeacherDto> teachers = teacherService.findAll();
 
-        all.forEach(teacher -> {
+        for (TeacherDto teacher : teachers) {
             String resourceUrl = ServletUriComponentsBuilder
                     .fromCurrentContextPath()
                     .path("/api/v1/teachers/{id}")
                     .buildAndExpand(teacher.getId())
                     .toUriString();
             teacher.setUrl(resourceUrl);
-        });
+        }
 
-        return ResponseEntity.ok(all);
+        return ResponseEntity.ok(teachers);
     }
 
 
@@ -77,7 +77,7 @@ public class TeacherController {
 //    }
     @PostMapping
     public ResponseEntity<TeacherDto> create(@Valid @RequestBody CreateTeacherCommand command) {
-        TeacherDto createdTeacher = teacherService.create(command);
+        TeacherDto teacher = teacherService.create(command);
 //        return ResponseEntity
 //                .status(HttpStatus.CREATED)
 //                .body(createdTeacher);
@@ -93,12 +93,12 @@ public class TeacherController {
         String resourceUrl = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/v1/teachers/{id}")
-                .buildAndExpand(createdTeacher.getId())
+                .buildAndExpand(teacher.getId())
                 .toUriString();
 
-        createdTeacher.setUrl(resourceUrl);
+        teacher.setUrl(resourceUrl);
 //        return ResponseEntity.created(location).body(createdTeacher);
-        return ResponseEntity.created(URI.create(resourceUrl)).body(createdTeacher);
+        return ResponseEntity.created(URI.create(resourceUrl)).body(teacher);
     }
 
     @PutMapping("/{id}")
@@ -107,13 +107,27 @@ public class TeacherController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(@PathVariable int id) {
         teacherService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(params = "language")
-    public List<TeacherDto> getAll(@RequestParam("language") Language language) {
-        return teacherService.findAllByLanguage(language);
+    public ResponseEntity<List<TeacherDto>> getAll(@RequestParam("language") Language language) {
+        List<TeacherDto> languages = teacherService.findAllByLanguage(language);
+
+
+        for (TeacherDto teacher : languages) {
+            String resourceUrl = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/api/v1/teachers/{id}")
+                    .buildAndExpand(teacher.getId())
+                    .toUriString();
+            teacher.setUrl(resourceUrl);
+        }
+
+
+        return ResponseEntity.ok(languages);
     }
 
     //#####################################################################
