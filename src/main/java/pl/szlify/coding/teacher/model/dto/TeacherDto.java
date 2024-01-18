@@ -1,15 +1,13 @@
 package pl.szlify.coding.teacher.model.dto;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import pl.szlify.coding.common.Language;
 import pl.szlify.coding.teacher.model.Teacher;
 
 import java.util.Set;
 
 @Getter
+@Setter
 @Builder
 @EqualsAndHashCode
 @ToString
@@ -19,7 +17,8 @@ public class TeacherDto {
     private String lastName;
     private Set<Language> languages;
     private boolean deleted;
-//    private boolean fired;
+    //    private boolean fired;
+    private String url;
 
     public static TeacherDto fromEntity(Teacher teacher) {
         return TeacherDto.builder()
