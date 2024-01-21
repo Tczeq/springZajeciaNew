@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.szlify.coding.common.exception.LanguageMismatchException;
+import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.student.model.command.CreateStudentCommand;
 import pl.szlify.coding.student.model.command.UpdateStudentCommand;
-import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.student.model.dto.StudentDto;
 import pl.szlify.coding.teacher.TeacherRepository;
 import pl.szlify.coding.teacher.model.Teacher;
@@ -22,13 +22,13 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
 
-    public List<StudentDto> findAll(){
+    public List<StudentDto> findAll() {
         return studentRepository.findAll().stream()
                 .map(StudentDto::fromEntity)
                 .toList();
     }
 
-    public StudentDto create(CreateStudentCommand command, int teacherId){
+    public StudentDto create(CreateStudentCommand command, int teacherId) {
 
         Student student = command.toEntity();
 
@@ -70,10 +70,10 @@ public class StudentService {
         Student student = studentRepository.findWithLockingById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat
                         .format("Student with id={0} not found", id)));
-        if(command.getFirstName() != null) {
+        if (command.getFirstName() != null) {
             student.setFirstName(command.getFirstName());
         }
-        if(command.getLastName() != null){
+        if (command.getLastName() != null) {
             student.setLastName(command.getLastName());
         }
         return StudentDto.fromEntity(student);

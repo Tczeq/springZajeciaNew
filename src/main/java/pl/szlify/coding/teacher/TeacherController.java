@@ -57,17 +57,4 @@ public class TeacherController {
     //#####################################################################
 
 
-//    @PutMapping("/fire/{id}")
-//    public String firedTeacherById(@PathVariable("id") int teacherId) {
-//        teacherService.fireTeacher(teacherId);
-//        return "redirect:/teachers";
-//    }
-//
-//    @PutMapping("/hire/{id}")
-//    public String hiredTeacherById(@PathVariable("id") int teacherId) {
-//        teacherService.hireTeacher(teacherId);
-//        return "redirect:/teachers";
-//    }
-
-
 }

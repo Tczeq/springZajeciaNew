@@ -24,10 +24,12 @@ public class TeacherService {
                 .map(TeacherDto::fromEntity)
                 .toList();
     }
+
     public TeacherDto create(CreateTeacherCommand command) {
         Teacher teacher = command.toEntity();
         return TeacherDto.fromEntity(teacherRepository.save(teacher));
     }
+
     @Transactional
     public void deleteById(int idToDelete) {
         Teacher teacher = teacherRepository.findWithLockingById(idToDelete)
@@ -37,16 +39,12 @@ public class TeacherService {
         teacher.setDeleted(true);
         teacherRepository.save(teacher);
     }
+
     public List<TeacherDto> findAllByLanguage(Language language) {
         return teacherRepository.findAllByLanguagesContaining(language).stream()
                 .map(TeacherDto::fromEntity)
                 .toList();
     }
-//    public Teacher findTeacherById(int teacherId) {
-//        return teacherRepository.findById(teacherId)
-//                .orElseThrow(() -> new EntityNotFoundException("Teacher with id=" + teacherId + " not found"));
-//    }
-
 
     @Transactional
     public TeacherDto update(int id, UpdateTeacherCommand command) {

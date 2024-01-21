@@ -22,25 +22,6 @@ public class LessonController {
         return lessonService.findAll();
     }
 
-
-    /*
-     * Dodaje tutaj Model, aby mozna bylo po froncie wyswietlac wiadomosci
-     * */
-//    @PostMapping("/create")
-//    public String create(Lesson lesson, @RequestParam int teacherId, @RequestParam int studentId, Model model) {
-//        try {
-//            lessonService.create(lesson, teacherId, studentId);
-//            return "redirect:/lessons";
-//        } catch (InvalidDate e) {
-//            model.addAttribute("errorMessage", e.getMessage());
-//            return "lesson/form";
-//        } catch (EntityNotFoundException e) {
-//            model.addAttribute("errorMessage", e.getMessage());
-//            return "redirect:/lessons";
-//        }
-//
-//    }
-
     @PostMapping
     public LessonDto create(@RequestBody CreateLessonCommand command) {
         return lessonService.create(command, command.getTeacherId(), command.getStudentId());
