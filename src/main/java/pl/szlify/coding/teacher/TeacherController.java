@@ -30,11 +30,6 @@ public class TeacherController {
     //  PATCH   /{id}   - update zasobu o wskazanym id (czesciowy)
     //  DELETE  /{id}   - usuwanie zasobu o wskazanym id
 
-//    @GetMapping
-//    public List<TeacherDto> getAll() {
-//        return teacherService.findAll();
-//    }
-
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAll() {
         List<TeacherDto> teachers = teacherService.findAll();
@@ -67,29 +62,12 @@ public class TeacherController {
                 .toUriString();
 
         teacher.setUrl(resourceUrl);
-//        return ResponseEntity.created(location).body(createdTeacher);
         return ResponseEntity.ok(teacher);
     }
 
-//    @PostMapping
-//    public TeacherDto create(@Valid @RequestBody CreateTeacherCommand command) {
-//        return teacherService.create(command);
-//    }
     @PostMapping
     public ResponseEntity<TeacherDto> create(@Valid @RequestBody CreateTeacherCommand command) {
         TeacherDto teacher = teacherService.create(command);
-//        return ResponseEntity
-//                .status(HttpStatus.CREATED)
-//                .body(createdTeacher);
-//        TeacherDto createdTeacher = teacherService.create(command);
-
-
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(createdTeacher.getId())
-//                .toUri();
-
         String resourceUrl = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/v1/teachers/{id}")
@@ -97,7 +75,6 @@ public class TeacherController {
                 .toUriString();
 
         teacher.setUrl(resourceUrl);
-//        return ResponseEntity.created(location).body(createdTeacher);
         return ResponseEntity.created(URI.create(resourceUrl)).body(teacher);
     }
 
@@ -132,18 +109,6 @@ public class TeacherController {
 
     //#####################################################################
 
-
-//    @PutMapping("/fire/{id}")
-//    public String firedTeacherById(@PathVariable("id") int teacherId) {
-//        teacherService.fireTeacher(teacherId);
-//        return "redirect:/teachers";
-//    }
-//
-//    @PutMapping("/hire/{id}")
-//    public String hiredTeacherById(@PathVariable("id") int teacherId) {
-//        teacherService.hireTeacher(teacherId);
-//        return "redirect:/teachers";
-//    }
 
 
 }

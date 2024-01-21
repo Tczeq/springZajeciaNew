@@ -56,22 +56,6 @@ public class LessonService {
         return LessonDto.fromEntity(lessonRepository.save(lesson));
     }
 
-//    public Lesson findLessonById(int lessonId) {
-//
-//        Lesson lesson = lessonRepository.findById(lessonId)
-//                .orElseThrow(() -> new EntityNotFoundException("Teacher with id " + lessonId + " not found"));
-//
-//        boolean beforeTerm = lesson.getTerm().isBefore(LocalDateTime.now());
-//        boolean afterTerm = lesson.getTerm().plusHours(1).isAfter(LocalDateTime.now());
-//
-//        if (beforeTerm && afterTerm) {
-//            throw new InvalidDate("Lesson already started");
-//        }
-//
-//        return lesson;
-//    }
-
-    //FIXME
     @Transactional
     public LessonDto update(int id, UpdateLessonCommand command) {
         Lesson lesson = lessonRepository.findById(id)
