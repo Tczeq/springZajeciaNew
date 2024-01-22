@@ -32,7 +32,6 @@ public class LessonService {
     }
 
 
-    @Transactional
     public LessonDto create(CreateLessonCommand command, int teacherId, int studentId) {
 
         Lesson lesson = command.toEntity();

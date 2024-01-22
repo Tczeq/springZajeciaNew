@@ -24,7 +24,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
-
+@EqualsAndHashCode
 @SQLDelete(sql = "UPDATE teacher SET deleted = 1, version = version + 1 WHERE id = ? AND version = ?")
 
 //@Where(clause = "deleted = false") // tutaj ustawiamy gdy chcemy wyswietlic tylko tych ktorzy sa zatudnieni albo nie

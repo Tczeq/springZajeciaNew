@@ -90,20 +90,19 @@ class TeacherServiceTest {
                 .build();
 
         Teacher toSave = command.toEntity();
+        when(teacherRepository.save(any(Teacher.class))).thenReturn(toSave);
 
         //when
-        TeacherDto teacherDto = teacherService.create(command);
+        teacherService.create(command);
 
         //then
-
         verify(teacherRepository).save(teacherArgumentCaptor.capture());
         Teacher saved = teacherArgumentCaptor.getValue();
+
         assertEquals(toSave.getFirstName(), saved.getFirstName());
         assertEquals(toSave.getLastName(), saved.getLastName());
         assertEquals(toSave.getLanguages(), saved.getLanguages());
-//        assertEquals(toSave, saved);
-
-
+        assertEquals(toSave, saved);
     }
 
 

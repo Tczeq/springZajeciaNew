@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
+@EqualsAndHashCode
 //@SQLDelete(sql = "UPDATE lesson SET deleted = 1 WHERE id = ?")
 @SQLDelete(sql = "UPDATE lesson SET deleted = 1 WHERE id = ? AND deleted = ?")
 //@Where(clause = "deleted = false")

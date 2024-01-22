@@ -58,6 +58,12 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
+    public Student findById(int id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
+                        .format("Student with id={0} not found", id)));
+    }
+
     @Transactional
     public StudentDto update(int id, UpdateStudentCommand command) {
         Student student = studentRepository.findWithLockingById(id)
