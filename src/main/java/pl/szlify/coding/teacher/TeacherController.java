@@ -46,7 +46,6 @@ public class TeacherController {
         return teacherService.update(id, command);
     }
 
-
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
         teacherService.deleteById(id);
@@ -56,8 +55,4 @@ public class TeacherController {
     public List<TeacherDto> getAll(@RequestParam("language") Language language) {
         return teacherService.findAllByLanguage(language);
     }
-
-    //#####################################################################
-
-
 }
