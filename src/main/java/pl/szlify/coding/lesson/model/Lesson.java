@@ -1,10 +1,9 @@
 package pl.szlify.coding.lesson.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.AssertFalse;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.teacher.model.Teacher;
 
@@ -41,5 +40,6 @@ public class Lesson {
     private Integer version;
 
     @Column(name = "deleted")
-    private Boolean isDeleted = false;
+    @AssertFalse
+    private Boolean isDeleted;
 }

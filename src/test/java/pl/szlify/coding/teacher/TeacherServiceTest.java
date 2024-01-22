@@ -80,31 +80,31 @@ class TeacherServiceTest {
         assertNotEquals(List.of(expected), actualTeachers);
     }
 
-//    @Test
-//    void testCreate_HappyPath_ResultsInTeacherBeingSaved() {
-//        //given
-//        CreateTeacherCommand command = CreateTeacherCommand.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(Language.JAVA, Language.JS))
-//                .build();
-//
-//        Teacher toSave = command.toEntity();
-//
-//        //when
-//        TeacherDto teacherDto = teacherService.create(command);
-//
-//        //then
-//
-//        verify(teacherRepository).save(teacherArgumentCaptor.capture());
-//        Teacher saved = teacherArgumentCaptor.getValue();
-//        assertEquals(toSave.getFirstName(), saved.getFirstName());
-//        assertEquals(toSave.getLastName(), saved.getLastName());
-//        assertEquals(toSave.getLanguages(), saved.getLanguages());
+    @Test
+    void testCreate_HappyPath_ResultsInTeacherBeingSaved() {
+        //given
+        CreateTeacherCommand command = CreateTeacherCommand.builder()
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(Language.JAVA, Language.JS))
+                .build();
+
+        Teacher toSave = command.toEntity();
+
+        //when
+        TeacherDto teacherDto = teacherService.create(command);
+
+        //then
+
+        verify(teacherRepository).save(teacherArgumentCaptor.capture());
+        Teacher saved = teacherArgumentCaptor.getValue();
+        assertEquals(toSave.getFirstName(), saved.getFirstName());
+        assertEquals(toSave.getLastName(), saved.getLastName());
+        assertEquals(toSave.getLanguages(), saved.getLanguages());
 //        assertEquals(toSave, saved);
 
 
-//    }
+    }
 
 
 

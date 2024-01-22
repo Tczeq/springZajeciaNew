@@ -32,7 +32,6 @@ public class StudentService {
 
         Student student = command.toEntity();
 
-
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat
                         .format("Teacher with id={0} not found", teacherId)));
@@ -57,12 +56,6 @@ public class StudentService {
     @Transactional
     public void deleteById(int id) {
         studentRepository.deleteById(id);
-    }
-
-    public Student findById(int id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Student with id={0} not found", id)));
     }
 
     @Transactional

@@ -17,6 +17,8 @@ public class TeacherController {
 
     private final TeacherService teacherService;
 
+    //TODO;
+
     //  GET             - pobieranie wszystkich zasobow
     //  GET     /{id}   - pobieranie zasobuo wskazanym id
     //  POST            - utworzenie nowego zasobu
@@ -43,6 +45,7 @@ public class TeacherController {
     public TeacherDto updateTeacher(@PathVariable int id, @Valid @RequestBody UpdateTeacherCommand command) {
         return teacherService.update(id, command);
     }
+
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {

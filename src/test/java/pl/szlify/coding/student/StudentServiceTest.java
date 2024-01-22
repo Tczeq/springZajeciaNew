@@ -59,11 +59,6 @@ class StudentServiceTest {
                 .lastName("Testowy")
                 .language(Language.JAVA)
                 .build();
-//        Student toSave = Student.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
         Teacher teacher = Teacher.builder()
                 .languages(Set.of(toSave.getLanguage()))
                 .build();

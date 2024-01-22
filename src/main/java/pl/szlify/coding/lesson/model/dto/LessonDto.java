@@ -16,9 +16,6 @@ public class LessonDto {
 
     private int id;
     private LocalDateTime term;
-//    private Teacher teacher;
-//    private Student student;
-
     private Integer teacherId;
     private Integer studentId;
     private Boolean deleted;
