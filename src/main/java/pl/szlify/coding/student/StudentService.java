@@ -1,15 +1,16 @@
 package pl.szlify.coding.student;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.szlify.coding.common.exception.LanguageMismatchException;
+import pl.szlify.coding.student.exception.StudentNotFoundException;
 import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.student.model.command.CreateStudentCommand;
 import pl.szlify.coding.student.model.command.UpdateStudentCommand;
 import pl.szlify.coding.student.model.dto.StudentDto;
 import pl.szlify.coding.teacher.TeacherRepository;
+import pl.szlify.coding.teacher.exception.TeacherNotFoundException;
 import pl.szlify.coding.teacher.model.Teacher;
 
 import java.text.MessageFormat;
@@ -33,8 +34,7 @@ public class StudentService {
         Student student = command.toEntity();
 
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Teacher with id={0} not found", teacherId)));
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
         if (!teacher.getLanguages().contains(student.getLanguage())) {
             throw new LanguageMismatchException(MessageFormat
                     .format("Language for teacher with id={0} not found", teacherId));
@@ -46,8 +46,7 @@ public class StudentService {
 
     public List<StudentDto> findStudentsByTeacher(int teacherId) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Teacher with id={0} not found", teacherId)));
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
         return studentRepository.findAllByTeacher(teacher).stream()
                 .map(StudentDto::fromEntity)
                 .toList();
@@ -60,15 +59,13 @@ public class StudentService {
 
     public Student findById(int id) {
         return studentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Student with id={0} not found", id)));
+                .orElseThrow(() -> new StudentNotFoundException(id));
     }
 
     @Transactional
     public StudentDto update(int id, UpdateStudentCommand command) {
         Student student = studentRepository.findWithLockingById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Student with id={0} not found", id)));
+                .orElseThrow(() -> new StudentNotFoundException(id));
         if (command.getFirstName() != null) {
             student.setFirstName(command.getFirstName());
         }

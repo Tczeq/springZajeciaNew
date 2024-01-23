@@ -41,6 +41,6 @@ public class Lesson {
     private Integer version;
 
     @Column(name = "deleted")
-    @AssertFalse
-    private Boolean isDeleted;
+//    @AssertFalse
+    private Boolean isDeleted = false;
 }

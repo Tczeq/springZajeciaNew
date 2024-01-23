@@ -1,6 +1,7 @@
 package pl.szlify.coding.lesson;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.szlify.coding.lesson.model.command.CreateLessonCommand;
@@ -23,12 +24,12 @@ public class LessonController {
     }
 
     @PostMapping
-    public LessonDto create(@RequestBody CreateLessonCommand command) {
+    public LessonDto create(@Valid @RequestBody CreateLessonCommand command) {
         return lessonService.create(command, command.getTeacherId(), command.getStudentId());
     }
 
     @PutMapping("/{id}")
-    public LessonDto updateLesson(@PathVariable int id, @RequestBody UpdateLessonCommand command) {
+    public LessonDto updateLesson(@PathVariable int id, @Valid @RequestBody UpdateLessonCommand command) {
         return lessonService.update(id, command);
     }
 

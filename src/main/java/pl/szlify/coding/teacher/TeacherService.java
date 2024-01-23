@@ -1,16 +1,15 @@
 package pl.szlify.coding.teacher;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.szlify.coding.common.Language;
+import pl.szlify.coding.teacher.exception.TeacherNotFoundException;
 import pl.szlify.coding.teacher.model.Teacher;
 import pl.szlify.coding.teacher.model.command.CreateTeacherCommand;
 import pl.szlify.coding.teacher.model.command.UpdateTeacherCommand;
 import pl.szlify.coding.teacher.model.dto.TeacherDto;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -33,8 +32,7 @@ public class TeacherService {
     @Transactional
     public void deleteById(int idToDelete) {
         Teacher teacher = teacherRepository.findWithLockingById(idToDelete)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Teacher with id={0} not found", idToDelete)));
+                .orElseThrow(() -> new TeacherNotFoundException(idToDelete));
 
         teacher.setDeleted(true);
         teacherRepository.save(teacher);
@@ -49,8 +47,7 @@ public class TeacherService {
     @Transactional
     public TeacherDto update(int id, UpdateTeacherCommand command) {
         Teacher teacher = teacherRepository.findWithLockingById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Teacher with id={0} not found", id)));
+                .orElseThrow(() -> new TeacherNotFoundException(id));
 
         if (command.getFirstName() != null) {
             teacher.setFirstName(command.getFirstName());
@@ -71,8 +68,7 @@ public class TeacherService {
     public TeacherDto findById(int id) {
         return teacherRepository.findById(id)
                 .map(TeacherDto::fromEntity)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat
-                        .format("Teacher with id={0} not found", id)));
+                .orElseThrow(() -> new TeacherNotFoundException(id));
     }
 
 }

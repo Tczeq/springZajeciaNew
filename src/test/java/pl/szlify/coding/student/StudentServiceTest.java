@@ -10,10 +10,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.szlify.coding.common.Language;
 import pl.szlify.coding.common.exception.LanguageMismatchException;
+import pl.szlify.coding.student.exception.StudentNotFoundException;
 import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.student.model.command.CreateStudentCommand;
 import pl.szlify.coding.student.model.dto.StudentDto;
 import pl.szlify.coding.teacher.TeacherRepository;
+import pl.szlify.coding.teacher.exception.TeacherNotFoundException;
 import pl.szlify.coding.teacher.model.Teacher;
 
 import java.text.MessageFormat;
@@ -60,11 +62,6 @@ class StudentServiceTest {
                 .lastName("Testowy")
                 .language(Language.JAVA)
                 .build();
-//        Student student = Student.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
 
         Student student = command.toEntity();
         Teacher teacher = Teacher.builder()
@@ -89,10 +86,10 @@ class StudentServiceTest {
 
 
     @Test
-    void testCreate_TeacherNotFound_ResultsInEntityNotFoundException() {
+    void testCreate_TeacherNotFound_ResultsInTeacherNotFoundException() {
         //given
         int teacherId = 2;
-        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
+//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
         CreateStudentCommand command = CreateStudentCommand.builder()
                 .firstName("Tes")
@@ -103,9 +100,8 @@ class StudentServiceTest {
         when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
 
         //when //then
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> studentService.create(command, teacherId))
-                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(TeacherNotFoundException.class)
+                .isThrownBy(() -> studentService.create(command, teacherId));
 
         verify(teacherRepository).findById(teacherId);
         verifyNoInteractions(studentRepository);
@@ -161,16 +157,15 @@ class StudentServiceTest {
     }
 
     @Test
-    void testFindStudentById_StudentNotFound_ResultsInEntityNotFoundException() {
+    void testFindStudentById_StudentNotFound_ResultsInStudentNotFoundException() {
         //given
         int studentId = 3;
         String exceptionMsg = MessageFormat.format("Student with id={0} not found", studentId);
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         //when //then
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> studentService.findById(studentId))
-                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(StudentNotFoundException.class)
+                .isThrownBy(() -> studentService.findById(studentId));
 
         verify(studentRepository).findById(studentId);
     }
@@ -199,7 +194,6 @@ class StudentServiceTest {
         //when
         List<StudentDto> actualStudents = studentService.findStudentsByTeacher(teacherId);
 
-
         //then
         verify(studentRepository).findAllByTeacher(teacher);
         verify(teacherRepository).findById(teacherId);
@@ -221,19 +215,18 @@ class StudentServiceTest {
     }
 
     @Test
-    void testDeleteById_StudentNotFound_ResultsInEntityNotFoundException() {
+    void testDeleteById_StudentNotFound_ResultsInStudentNotFoundException() {
         //given
         int studentId = 3;
-        String exceptionMsg = MessageFormat.format("Student with id={0} not found", studentId);
+//        String exceptionMsg = MessageFormat.format("Student with id={0} not found", studentId);
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         //when
         studentService.deleteById(studentId);
 
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> studentService.findById(studentId))
-                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(StudentNotFoundException.class)
+                .isThrownBy(() -> studentService.findById(studentId));
         //then
         verify(studentRepository).deleteById(studentId);
     }

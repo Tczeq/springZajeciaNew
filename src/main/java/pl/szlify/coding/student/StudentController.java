@@ -1,6 +1,7 @@
 package pl.szlify.coding.student;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.szlify.coding.student.model.command.CreateStudentCommand;
@@ -21,7 +22,7 @@ public class StudentController {
     }
 
     @PostMapping
-    public StudentDto create(@RequestBody CreateStudentCommand command) {
+    public StudentDto create(@Valid @RequestBody CreateStudentCommand command) {
         return studentService.create(command, command.getTeacherId());
     }
 
@@ -36,7 +37,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public StudentDto updateStudent(@PathVariable int id, @RequestBody UpdateStudentCommand command) {
+    public StudentDto updateStudent(@PathVariable int id, @Valid @RequestBody UpdateStudentCommand command) {
         return studentService.update(id, command);
     }
 

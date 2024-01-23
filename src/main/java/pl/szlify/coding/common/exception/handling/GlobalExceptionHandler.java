@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionDto handleEntityNotFoundException(EntityNotFoundException exception) {
+    public ExceptionDto handleEntityNotFoundException(RuntimeException exception) {
         return new ExceptionDto(exception.getMessage());
     }
 

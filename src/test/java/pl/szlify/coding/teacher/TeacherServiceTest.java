@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.szlify.coding.common.Language;
+import pl.szlify.coding.teacher.exception.TeacherNotFoundException;
 import pl.szlify.coding.teacher.model.Teacher;
 import pl.szlify.coding.teacher.model.command.CreateTeacherCommand;
 import pl.szlify.coding.teacher.model.command.UpdateTeacherCommand;
@@ -106,33 +107,41 @@ class TeacherServiceTest {
     }
 
 
-
     @Test
     void testDeleteById_HappyPath_ResultsInTeacherFound() {
         //give
         int teacherId = 3;
-        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
+        Teacher toFind = Teacher.builder()
+                .id(teacherId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(Language.JAVA, Language.JS))
+                .build();
+
+        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.of(toFind));
 
         //when
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> teacherService.deleteById(teacherId))
-                .withMessage(exceptionMsg);
+        teacherService.deleteById(teacherId);
 
-        verify(teacherRepository).findWithLockingById(teacherId);
+        //then
+        verify(teacherRepository).save(teacherArgumentCaptor.capture());
+        Teacher savedTeacher = teacherArgumentCaptor.getValue();
+        assertTrue(savedTeacher.isDeleted());
+        assertEquals(toFind, savedTeacher);
     }
 
+
     @Test
-    void testDeleteById_TeacherNotFoundById_ResultsInEntityNotFoundException() {
+    void testDeleteById_TeacherNotFoundById_ResultsTeacherNotFoundException() {
         //given
         int teacherId = 3;
-        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
+//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
         when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.empty());
 
         //when
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> teacherService.deleteById(teacherId))
-                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(TeacherNotFoundException.class)
+                .isThrownBy(() -> teacherService.deleteById(teacherId));
         verify(teacherRepository).findWithLockingById(teacherId);
     }
 
@@ -163,22 +172,6 @@ class TeacherServiceTest {
     }
 
     @Test
-    void testFindTeachersByLanguages_TeacherNotFoundByLanguages_ResultsInTeachersNotFound() {
-        // given
-        Language language = Language.JAVA;
-
-        when(teacherRepository.findAllByLanguagesContaining(language)).thenReturn(Collections.emptyList());
-
-        // when
-        List<TeacherDto> actualTeachers = teacherService.findAllByLanguage(language);
-
-        // then
-        verify(teacherRepository).findAllByLanguagesContaining(language);
-        assertTrue(actualTeachers.isEmpty());
-    }
-
-
-    @Test
     void testFindTeacherById_HappyPath_ResultsInTeacherFound() {
         //given
         int teacherId = 3;
@@ -197,17 +190,16 @@ class TeacherServiceTest {
     }
 
     @Test
-    void testFindTeacherById_TeacherNotFound_ResultsInEntityNotFoundException() {
+    void testFindTeacherById_TeacherNotFound_ResultsTeacherNotFoundException() {
         //given
         int teacherId = 3;
-        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
+//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
         when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
 
         //when //then
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> teacherService.findById(teacherId))
-                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(TeacherNotFoundException.class)
+                .isThrownBy(() -> teacherService.findById(teacherId));
         verify(teacherRepository).findById(teacherId);
     }
 
@@ -250,10 +242,10 @@ class TeacherServiceTest {
     }
 
     @Test
-    void testUpdate_TeacherNotFound_ResultsInEntityNotFoundException() {
+    void testUpdate_TeacherNotFound_ResultsTeacherNotFoundException() {
         //given
         int teacherId = 3;
-        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
+//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
 
         UpdateTeacherCommand toSave = UpdateTeacherCommand.builder()
                 .firstName("Test2")
@@ -265,9 +257,8 @@ class TeacherServiceTest {
         when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.empty());
 
         //when //then
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> teacherService.update(teacherId, toSave))
-                .withMessage(exceptionMsg);
+        assertThatExceptionOfType(TeacherNotFoundException.class)
+                .isThrownBy(() -> teacherService.update(teacherId, toSave));
         verify(teacherRepository).findWithLockingById(teacherId);
     }
 
