@@ -72,11 +72,8 @@ public class LessonService {
 
     @Transactional
     public void deleteById(int id) {
-        Lesson lesson = lessonRepository.findById(id)
+        lessonRepository.findById(id)
                 .orElseThrow(() -> new LessonNotFoundException(id));
-        if (lesson.getDeleted() == null) {
-            lesson.setDeleted(false);
-        }
         lessonRepository.deleteById(id);
     }
 }
