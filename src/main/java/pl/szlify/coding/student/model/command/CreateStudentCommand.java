@@ -19,8 +19,10 @@ public class CreateStudentCommand {
     @NotNull(message = "lastname is mandatory")
     private String lastName;
 
+    //todo: notNull
     private Language language;
 
+    //todo: positive
     private int teacherId;
 
     public Student toEntity() {

@@ -9,10 +9,8 @@ import lombok.Data;
 public class UpdateStudentCommand {
 
     @Pattern(regexp = "[A-Z][a-z]{1,50}", message = "The firstName must begin with a capital letter and contain from 1 to 50 letters.")
-    @NotNull(message = "firstName is mandatory")
     private String firstName;
 
     @Pattern(regexp = "[A-Z][a-z]{1,50}", message = "The lastname must begin with a capital letter and contain from 1 to 50 letters.")
-    @NotNull(message = "lastname is mandatory")
     private String lastName;
 }

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class CreateLessonCommand {
-
+    //todo: notNull
     @FutureOrPresent(message = "Term have to be in future or present")
     private LocalDateTime term;
 
@@ -20,8 +20,10 @@ public class CreateLessonCommand {
 //
 //    private Student student;
 
+    //todo: positive
     private int teacherId;
 
+    //todo: positive
     private int studentId;
 
 
