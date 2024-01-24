@@ -3,7 +3,6 @@ package pl.szlify.coding.lesson.model.command;
 import jakarta.validation.constraints.FutureOrPresent;
 import lombok.Builder;
 import lombok.Data;
-import pl.szlify.coding.lesson.model.Lesson;
 
 import java.time.LocalDateTime;
 

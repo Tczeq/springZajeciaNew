@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import pl.szlify.coding.lesson.model.Lesson;
-import pl.szlify.coding.student.model.Student;
-import pl.szlify.coding.teacher.model.Teacher;
 
 import java.time.LocalDateTime;
 
@@ -18,15 +16,15 @@ public class LessonDto {
     private LocalDateTime term;
     private Integer teacherId;
     private Integer studentId;
-    private Boolean deleted;
+    private boolean deleted;
 
     public static LessonDto fromEntity(Lesson lesson) {
         return LessonDto.builder()
                 .id(lesson.getId())
                 .term(lesson.getTerm())
-                .teacherId(lesson.getTeacher() != null ? lesson.getTeacher().getId() : null)
-                .studentId(lesson.getStudent() != null ? lesson.getStudent().getId() : null)
-                .deleted(lesson.getIsDeleted() != null ? lesson.getIsDeleted() : null)
+                .teacherId(lesson.getTeacher().getId())
+                .studentId(lesson.getStudent().getId())
+                .deleted(lesson.isDeleted())
                 .build();
     }
 }

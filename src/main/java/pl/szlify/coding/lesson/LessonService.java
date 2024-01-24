@@ -35,13 +35,11 @@ public class LessonService {
 
     @Transactional
     public LessonDto create(CreateLessonCommand command, int teacherId, int studentId) {
-
-        Lesson lesson = command.toEntity();
-
-        LocalDateTime term = lesson.getTerm();
+        LocalDateTime term = command.getTerm();
         if (term.isBefore(LocalDateTime.now())) {
             throw new PastTermException("Term cannot be from the past ");
         }
+
         Teacher teacher = teacherRepository.findWithLockingById(teacherId)
                 .orElseThrow(() -> new TeacherNotFoundException(teacherId));
         if (lessonRepository.existsByTeacherIdAndTermAfterAndTermBefore(teacherId, term.minusHours(1), term.plusHours(1))) {
@@ -49,6 +47,7 @@ public class LessonService {
         }
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException(studentId));
+        Lesson lesson = command.toEntity();
         lesson.setStudent(student);
         lesson.setTeacher(teacher);
 
@@ -75,8 +74,8 @@ public class LessonService {
     public void deleteById(int id) {
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new LessonNotFoundException(id));
-        if (lesson.getIsDeleted() == null) {
-            lesson.setIsDeleted(false);
+        if (lesson.getDeleted() == null) {
+            lesson.setDeleted(false);
         }
         lessonRepository.deleteById(id);
     }
