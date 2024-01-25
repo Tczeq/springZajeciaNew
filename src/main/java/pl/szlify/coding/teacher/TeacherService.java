@@ -59,7 +59,7 @@ public class TeacherService {
             teacher.setLanguages(command.getLanguages());
         }
 
-//        teacherRepository.save(teacher);
+        teacherRepository.save(teacher);
         return TeacherDto.fromEntity(teacher);
     }
 

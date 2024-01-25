@@ -41,7 +41,7 @@ class LessonServiceTest {
 //    @Test
 //    void testFindAll_HappyPath_ResultsInLessonFindAllLessons() {
 //        //given
-//        LocalDateTime localDateTime = LocalDateTime.of(2022, 12, 30, 12, 12);
+//        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
 //
 //        Student student = Student.builder()
 //                .firstName("Test")
@@ -237,41 +237,43 @@ class LessonServiceTest {
 //                .isThrownBy(() -> lessonService.create(command, studentId, teacherId));
 //    }
 //
-//    @Test
-//    void testDeleteById_HappyPath_ResultsInTeacherFound() {
-//
-//        //given
-//        LocalDateTime localDateTime = LocalDateTime.of(2025, 12, 30, 12, 12);
-//        int lessonID = 3;
-//        int teacherId = 1;
-//        int studentId = 1;
-//        Student student = Student.builder()
-//                .id(studentId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        Lesson lessonToFind = Lesson.builder()
-//                .id(lessonID)
-//                .term(localDateTime)
-//                .student(student)
-//                .teacher(teacher)
-//                .build();
-//
-//        when(lessonRepository.findById(lessonID)).thenReturn(Optional.of(lessonToFind));
-//
-//        //when
-//        lessonService.deleteById(lessonID);
-//
-//        //then
-//        verify(lessonRepository).deleteById(lessonID);
-//    }
+    @Test
+    void testDeleteById_HappyPath_ResultsInTeacherFound() {
+
+        //given
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);;
+        int lessonID = 3;
+        int teacherId = 1;
+        int studentId = 1;
+        Student student = Student.builder()
+                .id(studentId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .language(Language.JAVA)
+                .build();
+        Teacher teacher = Teacher.builder()
+                .id(teacherId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(student.getLanguage()))
+                .build();
+        Lesson lessonToFind = Lesson.builder()
+                .id(lessonID)
+                .term(localDateTime)
+                .student(student)
+                .teacher(teacher)
+                .build();
+
+        when(lessonRepository.findById(lessonID)).thenReturn(Optional.of(lessonToFind));
+
+        //when
+        lessonService.deleteById(lessonID);
+
+        //then
+        verify(lessonRepository).deleteById(lessonID);
+    }
+
+    //TODO; dodac przecwiny wypadek rzucanie bledem przy nie znalezniu id przy usuwaniu
 //
 //
 //    @Test

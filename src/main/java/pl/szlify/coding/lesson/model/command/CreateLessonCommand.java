@@ -20,7 +20,7 @@ public class CreateLessonCommand {
 //
 //    private Student student;
 
-    //todo: positive
+    //TODO: positive
     private int teacherId;
 
     //todo: positive

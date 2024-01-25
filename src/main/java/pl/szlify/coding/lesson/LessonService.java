@@ -19,6 +19,7 @@ import pl.szlify.coding.teacher.model.Teacher;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class LessonService {
     public LessonDto update(int id, UpdateLessonCommand command) {
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new LessonNotFoundException(id));
-        if (command.getTerm().isBefore(LocalDateTime.now())) {                 // to dodalem
+        if (command.getTerm().isBefore(LocalDateTime.now())) {
             throw new PastTermException("Term cannot be from the past ");
         }
         if (command.getTerm() != null) {
@@ -72,8 +73,14 @@ public class LessonService {
 
     @Transactional
     public void deleteById(int id) {
+        //stare
+//        lessonRepository.findById(id).orElseThrow(() -> new LessonNotFoundException(id));
+//        lessonRepository.deleteById(id);
+        //nowe
+//        Optional<Lesson> lessonToDelete = lessonRepository.findById(id);
+        //albo tak
         lessonRepository.findById(id)
-                .orElseThrow(() -> new LessonNotFoundException(id));
-        lessonRepository.deleteById(id);
+                .ifPresentOrElse(value ->  lessonRepository.deleteById(id),
+                () -> { throw new LessonNotFoundException(id); });
     }
 }
