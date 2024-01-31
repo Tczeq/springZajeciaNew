@@ -8,18 +8,26 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.szlify.coding.common.Language;
+import pl.szlify.coding.lesson.exception.PastTermException;
+import pl.szlify.coding.lesson.exception.TermUnavailableException;
 import pl.szlify.coding.lesson.model.Lesson;
 import pl.szlify.coding.lesson.model.command.CreateLessonCommand;
+import pl.szlify.coding.lesson.model.command.UpdateLessonCommand;
 import pl.szlify.coding.lesson.model.dto.LessonDto;
 import pl.szlify.coding.student.StudentRepository;
+import pl.szlify.coding.student.exception.StudentNotFoundException;
 import pl.szlify.coding.student.model.Student;
 import pl.szlify.coding.teacher.TeacherRepository;
+import pl.szlify.coding.teacher.exception.TeacherNotFoundException;
 import pl.szlify.coding.teacher.model.Teacher;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -38,35 +46,35 @@ class LessonServiceTest {
     @Captor
     private ArgumentCaptor<Lesson> lessonArgumentCaptor;
 
-//    @Test
-//    void testFindAll_HappyPath_ResultsInLessonFindAllLessons() {
-//        //given
-//        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
-//
-//        Student student = Student.builder()
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        Lesson toFind = Lesson.builder()
-//                .term(localDateTime)
-//                .student(student)
-//                .teacher(teacher)
-//                .build();
-//
-//        when(lessonRepository.findAll()).thenReturn(List.of(toFind));
-//
-//        //when
-//        List<LessonDto> actualLessons = lessonService.findAll();
-//
-//        //then
-//        verify(lessonRepository).findAll();
-//        LessonDto expected = LessonDto.fromEntity(toFind);
-//        assertEquals(List.of(expected), actualLessons);
-//    }
+    @Test
+    void testFindAll_HappyPath_ResultsInLessonFindAllLessons() {
+        //given
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+
+        Student student = Student.builder()
+                .firstName("Test")
+                .lastName("Testowy")
+                .language(Language.JAVA)
+                .build();
+        Teacher teacher = Teacher.builder()
+                .languages(Set.of(student.getLanguage()))
+                .build();
+        Lesson toFind = Lesson.builder()
+                .term(localDateTime)
+                .student(student)
+                .teacher(teacher)
+                .build();
+
+        when(lessonRepository.findAll()).thenReturn(List.of(toFind));
+
+        //when
+        List<LessonDto> actualLessons = lessonService.findAll();
+
+        //then
+        verify(lessonRepository).findAll();
+        LessonDto expected = LessonDto.fromEntity(toFind);
+        assertEquals(List.of(expected), actualLessons);
+    }
 
     @Test
     void testCreate_HappyPath_ResultsInLessonBeingSaved() {
@@ -122,126 +130,122 @@ class LessonServiceTest {
 
     }
 
-//    @Test
-//    void testCreate_TeacherNotFound_ResultsTeacherNotFoundException() {
-//        //given
-//        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
-//        int teacherId = 1;
-//        int studentId = 1;
-////        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
-//        Student student = Student.builder()
-//                .id(studentId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        CreateLessonCommand command = CreateLessonCommand.builder()
-//                .term(localDateTime)
-//                .student(student)
-//                .teacher(teacher)
-//                .build();
-//
-//        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.empty());
-//
-//        //when
-//        assertThatExceptionOfType(TeacherNotFoundException.class)
-//                .isThrownBy(() -> lessonService.create(command, teacherId, studentId));
-//        verify(teacherRepository).findWithLockingById(teacherId);
-//    }
-//
-//    @Test
-//    void testCreate_StudentNotFound_ResultsInStudentNotFoundException() {
-//        //given
-//        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
-//        int teacherId = 1;
-//        int studentId = 1;
-////        String exceptionMsg = MessageFormat.format("Student with id={0} not found", studentId);
-//        Student student = Student.builder()
-//                .id(studentId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        CreateLessonCommand command = CreateLessonCommand.builder()
-//                .term(localDateTime)
-//                .student(student)
-//                .teacher(teacher)
-//                .build();
-//
-//        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.of(teacher));
-//        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
-//
-//        //when
-//        assertThatExceptionOfType(StudentNotFoundException.class)
-//                .isThrownBy(() -> lessonService.create(command, teacherId, studentId));
-//        verify(studentRepository).findById(studentId);
-//    }
+    @Test
+    void testCreate_TeacherNotFound_ResultsTeacherNotFoundException() {
+        //given
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+        int teacherId = 1;
+        int studentId = 1;
+        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found.", teacherId);
 
-//
-//    @Test
-//    void testCreate_TermFromPast_ResultsInPastTermException() {
-//        //given
-//        LocalDateTime pastTerm = LocalDateTime.now().minusDays(1);
-//        int studentId = 1;
-//        int teacherId = 1;
-//
-//        CreateLessonCommand command = CreateLessonCommand.builder()
-//                .term(pastTerm)
-//                .build();
-//
-//        //when //then
-//        assertThatExceptionOfType(PastTermException.class)
-//                .isThrownBy(() -> lessonService.create(command, studentId, teacherId));
-//    }
-//
-//    @Test
-//    void testCreate_TermUnavailable_ResultsInTermUnavailableException() {
-//        //given
-//        LocalDateTime term = LocalDateTime.now().plusDays(1);
-//        int studentId = 1;
-//        int teacherId = 1;
-//        Student student = Student.builder()
-//                .id(studentId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        CreateLessonCommand command = CreateLessonCommand.builder()
-//                .term(term)
-//                .build();
-//
-//        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.of(teacher));
-//        when(lessonRepository.existsByTeacherIdAndTermAfterAndTermBefore(
-//                teacherId, term.minusHours(1), term.plusHours(1))).thenReturn(true);
-//
-//        //when //then
-//        assertThatExceptionOfType(TermUnavailableException.class)
-//                .isThrownBy(() -> lessonService.create(command, studentId, teacherId));
-//    }
-//
+        CreateLessonCommand command = CreateLessonCommand.builder()
+                .term(localDateTime)
+                .studentId(studentId)
+                .teacherId(teacherId)
+                .build();
+
+        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.empty());
+
+        //when
+        assertThatExceptionOfType(TeacherNotFoundException.class)
+                .isThrownBy(() -> lessonService.create(command, teacherId, studentId))
+                .withMessage(exceptionMsg);
+        verify(teacherRepository).findWithLockingById(teacherId);
+    }
+
+    @Test
+    void testCreate_StudentNotFound_ResultsInStudentNotFoundException() {
+        //given
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+        int teacherId = 1;
+        int studentId = 1;
+        String exceptionMsg = MessageFormat.format("Student with id={0} not found.", studentId);
+        Student student = Student.builder()
+                .id(studentId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .language(Language.JAVA)
+                .build();
+        Teacher teacher = Teacher.builder()
+                .id(teacherId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(student.getLanguage()))
+                .build();
+        CreateLessonCommand command = CreateLessonCommand.builder()
+                .term(localDateTime)
+                .studentId(studentId)
+                .teacherId(teacherId)
+                .build();
+
+        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.of(teacher));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
+
+        //when
+        assertThatExceptionOfType(StudentNotFoundException.class)
+                .isThrownBy(() -> lessonService.create(command, teacherId, studentId))
+                .withMessage(exceptionMsg);
+        verify(studentRepository).findById(studentId);
+    }
+
+
+    @Test
+    void testCreate_TermFromPast_ResultsInPastTermException() {
+        //given
+        String exceptionMsg = "Term cannot be from the past ";
+        LocalDateTime pastTerm = LocalDateTime.now().minusDays(1);
+        int studentId = 1;
+        int teacherId = 1;
+
+        CreateLessonCommand command = CreateLessonCommand.builder()
+                .term(pastTerm)
+                .build();
+
+        //when //then
+        assertThatExceptionOfType(PastTermException.class)
+                .isThrownBy(() -> lessonService.create(command, studentId, teacherId))
+                .withMessage(exceptionMsg);
+    }
+
+    @Test
+    void testCreate_TermUnavailable_ResultsInTermUnavailableException() {
+        //given
+        LocalDateTime term = LocalDateTime.now().plusDays(1);
+        int studentId = 1;
+        int teacherId = 1;
+        String exceptionMsg = "Term unavailable";
+        Student student = Student.builder()
+                .id(studentId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .language(Language.JAVA)
+                .build();
+        Teacher teacher = Teacher.builder()
+                .id(teacherId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(student.getLanguage()))
+                .build();
+        CreateLessonCommand command = CreateLessonCommand.builder()
+                .term(term)
+                .build();
+
+        when(teacherRepository.findWithLockingById(teacherId)).thenReturn(Optional.of(teacher));
+        when(lessonRepository.existsByTeacherIdAndTermAfterAndTermBefore(
+                teacherId, term.minusHours(1), term.plusHours(1))).thenReturn(true);
+
+        //when //then
+        assertThatExceptionOfType(TermUnavailableException.class)
+                .isThrownBy(() -> lessonService.create(command, studentId, teacherId))
+                .withMessage(exceptionMsg);
+    }
+
     @Test
     void testDeleteById_HappyPath_ResultsInTeacherFound() {
 
         //given
-        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);;
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+        ;
         int lessonID = 3;
         int teacherId = 1;
         int studentId = 1;
@@ -274,87 +278,89 @@ class LessonServiceTest {
     }
 
     //TODO; dodac przecwiny wypadek rzucanie bledem przy nie znalezniu id przy usuwaniu
-//
-//
-//    @Test
-//    void testUpdate_HappyPath_ResultsInLessonBeingUpdated() {
-//        //given
-//        int lessonId = 3;
-//        int teacherId = 1;
-//        int studentId = 1;
-//        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
-//        LocalDateTime toUpdateTime = LocalDateTime.now().plusDays(2);
-//        Student student = Student.builder()
-//                .id(studentId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        Lesson lessonToFind = Lesson.builder()
-//                .id(lessonId)
-//                .term(localDateTime)
-//                .student(student)
-//                .teacher(teacher)
-//                .build();
-//
-//        UpdateLessonCommand command = UpdateLessonCommand.builder()
-//                .term(toUpdateTime)
-//                .build();
-//        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lessonToFind));
-//
-//        //when
-//        LessonDto update = lessonService.update(lessonId, command);
-//
-//        //then
-//        verify(lessonRepository).save(lessonArgumentCaptor.capture());
-//        Lesson updatedLesson = lessonArgumentCaptor.getValue();
-//
-//        assertNotNull(updatedLesson);
-//        assertEquals(toUpdateTime, update.getTerm());
-//        verify(lessonRepository).findById(lessonId);
-//    }
-//
-//    @Test
-//    void testUpdate_TermFromPast_ResultsInPastTermException() {
-//        //given
-//        int lessonId = 3;
-//        int teacherId = 1;
-//        int studentId = 1;
-//        LocalDateTime toUpdateTime = LocalDateTime.now().minusDays(1);
-//        Student student = Student.builder()
-//                .id(studentId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .language(Language.JAVA)
-//                .build();
-//        Teacher teacher = Teacher.builder()
-//                .id(teacherId)
-//                .firstName("Test")
-//                .lastName("Testowy")
-//                .languages(Set.of(student.getLanguage()))
-//                .build();
-//        Lesson lessonToFind = Lesson.builder()
-//                .id(lessonId)
-//                .term(toUpdateTime)
-//                .student(student)
-//                .teacher(teacher)
-//                .build();
-//        UpdateLessonCommand command = UpdateLessonCommand.builder()
-//                .term(toUpdateTime)
-//                .build();
-//        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lessonToFind));
-//
-//        //when //then
-//        assertThatExceptionOfType(PastTermException.class)
-//                .isThrownBy(() -> lessonService.update(lessonId, command));
-//        verify(lessonRepository).findById(lessonId);
-//        verify(lessonRepository, never()).save(any(Lesson.class));
-//    }
+
+
+    @Test
+    void testUpdate_HappyPath_ResultsInLessonBeingUpdated() {
+        //given
+        int lessonId = 3;
+        int teacherId = 1;
+        int studentId = 1;
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+        LocalDateTime toUpdateTime = LocalDateTime.now().plusDays(2);
+        Student student = Student.builder()
+                .id(studentId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .language(Language.JAVA)
+                .build();
+        Teacher teacher = Teacher.builder()
+                .id(teacherId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(student.getLanguage()))
+                .build();
+        Lesson lessonToFind = Lesson.builder()
+                .id(lessonId)
+                .term(localDateTime)
+                .student(student)
+                .teacher(teacher)
+                .build();
+
+        UpdateLessonCommand command = UpdateLessonCommand.builder()
+                .term(toUpdateTime)
+                .build();
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lessonToFind));
+
+        //when
+        LessonDto update = lessonService.update(lessonId, command);
+
+        //then
+        verify(lessonRepository).save(lessonArgumentCaptor.capture());
+        Lesson updatedLesson = lessonArgumentCaptor.getValue();
+
+        assertNotNull(updatedLesson);
+        assertEquals(toUpdateTime, update.getTerm());
+        verify(lessonRepository).findById(lessonId);
+    }
+
+    @Test
+    void testUpdate_TermFromPast_ResultsInPastTermException() {
+        //given
+        int lessonId = 3;
+        int teacherId = 1;
+        int studentId = 1;
+        String exceptionMsg = "Term cannot be from the past ";
+        LocalDateTime toUpdateTime = LocalDateTime.now().minusDays(1);
+        Student student = Student.builder()
+                .id(studentId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .language(Language.JAVA)
+                .build();
+        Teacher teacher = Teacher.builder()
+                .id(teacherId)
+                .firstName("Test")
+                .lastName("Testowy")
+                .languages(Set.of(student.getLanguage()))
+                .build();
+        Lesson lessonToFind = Lesson.builder()
+                .id(lessonId)
+                .term(toUpdateTime)
+                .student(student)
+                .teacher(teacher)
+                .build();
+        UpdateLessonCommand command = UpdateLessonCommand.builder()
+                .term(toUpdateTime)
+                .build();
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lessonToFind));
+
+        //when //then
+        assertThatExceptionOfType(PastTermException.class)
+                .isThrownBy(() -> lessonService.update(lessonId, command))
+                .withMessage(exceptionMsg);
+        verify(lessonRepository).findById(lessonId);
+        verify(lessonRepository, never()).save(any(Lesson.class));
+    }
 
 }

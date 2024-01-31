@@ -17,6 +17,7 @@ import pl.szlify.coding.teacher.TeacherRepository;
 import pl.szlify.coding.teacher.exception.TeacherNotFoundException;
 import pl.szlify.coding.teacher.model.Teacher;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +39,13 @@ public class LessonService {
     public LessonDto create(CreateLessonCommand command, int teacherId, int studentId) {
         LocalDateTime term = command.getTerm();
         if (term.isBefore(LocalDateTime.now())) {
-            throw new PastTermException("Term cannot be from the past ");
+            throw new PastTermException();
         }
 
         Teacher teacher = teacherRepository.findWithLockingById(teacherId)
                 .orElseThrow(() -> new TeacherNotFoundException(teacherId));
         if (lessonRepository.existsByTeacherIdAndTermAfterAndTermBefore(teacherId, term.minusHours(1), term.plusHours(1))) {
-            throw new TermUnavailableException("Term unavailable");
+            throw new TermUnavailableException();
         }
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException(studentId));
@@ -61,7 +62,7 @@ public class LessonService {
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new LessonNotFoundException(id));
         if (command.getTerm().isBefore(LocalDateTime.now())) {
-            throw new PastTermException("Term cannot be from the past ");
+            throw new PastTermException();
         }
         if (command.getTerm() != null) {
             lesson.setTerm(command.getTerm());

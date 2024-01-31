@@ -1,7 +1,7 @@
 package pl.szlify.coding.lesson.exception;
 
 public class PastTermException extends RuntimeException {
-    public PastTermException(String message) {
-        super(message);
+    public PastTermException() {
+        super("Term cannot be from the past ");
     }
 }

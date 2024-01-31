@@ -36,8 +36,7 @@ public class StudentService {
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new TeacherNotFoundException(teacherId));
         if (!teacher.getLanguages().contains(student.getLanguage())) {
-            throw new LanguageMismatchException(MessageFormat
-                    .format("Language for teacher with id={0} not found", teacherId));
+            throw new LanguageMismatchException(teacherId);
         }
         student.setTeacher(teacher);
 

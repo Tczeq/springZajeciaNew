@@ -1,6 +1,5 @@
 package pl.szlify.coding.student;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -89,8 +88,7 @@ class StudentServiceTest {
     void testCreate_TeacherNotFound_ResultsInTeacherNotFoundException() {
         //given
         int teacherId = 2;
-//        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found", teacherId);
-
+        String exceptionMsg = MessageFormat.format("Teacher with id={0} not found.", teacherId);
         CreateStudentCommand command = CreateStudentCommand.builder()
                 .firstName("Tes")
                 .lastName("Testowy")
@@ -101,7 +99,8 @@ class StudentServiceTest {
 
         //when //then
         assertThatExceptionOfType(TeacherNotFoundException.class)
-                .isThrownBy(() -> studentService.create(command, teacherId));
+                .isThrownBy(() -> studentService.create(command, teacherId))
+                .withMessage(exceptionMsg);
 
         verify(teacherRepository).findById(teacherId);
         verifyNoInteractions(studentRepository);
@@ -160,12 +159,13 @@ class StudentServiceTest {
     void testFindStudentById_StudentNotFound_ResultsInStudentNotFoundException() {
         //given
         int studentId = 3;
-        String exceptionMsg = MessageFormat.format("Student with id={0} not found", studentId);
+        String exceptionMsg = MessageFormat.format("Student with id={0} not found.", studentId);
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         //when //then
         assertThatExceptionOfType(StudentNotFoundException.class)
-                .isThrownBy(() -> studentService.findById(studentId));
+                .isThrownBy(() -> studentService.findById(studentId))
+                .withMessage(exceptionMsg);
 
         verify(studentRepository).findById(studentId);
     }
@@ -218,15 +218,15 @@ class StudentServiceTest {
     void testDeleteById_StudentNotFound_ResultsInStudentNotFoundException() {
         //given
         int studentId = 3;
-//        String exceptionMsg = MessageFormat.format("Student with id={0} not found", studentId);
-
+        String exceptionMsg = MessageFormat.format("Student with id={0} not found.", studentId);
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         //when
         studentService.deleteById(studentId);
 
         assertThatExceptionOfType(StudentNotFoundException.class)
-                .isThrownBy(() -> studentService.findById(studentId));
+                .isThrownBy(() -> studentService.findById(studentId))
+                .withMessage(exceptionMsg);
         //then
         verify(studentRepository).deleteById(studentId);
     }
@@ -250,6 +250,7 @@ class StudentServiceTest {
         //then
         verify(studentRepository).findAll();
 
+        //TODO zle
         List<StudentDto> expectedStudentsDto = studentsFromRepo.stream()
                 .map(StudentDto::fromEntity)
                 .toList();

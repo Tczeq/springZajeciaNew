@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.szlify.coding.common.Language;
 import pl.szlify.coding.teacher.model.Teacher;
@@ -35,6 +36,9 @@ class TeacherControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    private MockRestServiceServer serviceServer;
+
     @Autowired
     private TeacherRepository teacherRepository;
 
@@ -259,8 +263,8 @@ class TeacherControllerTest {
                 .languages(Set.of(Language.C, java))
                 .build();
         Teacher teacher3 = Teacher.builder()
-                .firstName("Test2")
-                .lastName("Testowy2")
+                .firstName("Test3")
+                .lastName("Testowy3")
                 .languages(Set.of(Language.C, Language.PYTHON))
                 .build();
 
@@ -271,5 +275,13 @@ class TeacherControllerTest {
         mockMvc.perform(get("/api/v1/teachers?language=" + java))
                 .andDo(print())
                 .andExpect(status().isOk());
+
+        //można też tak
+//        MvcResult mvcResult = mockMvc.perform(get("/api/v1/teachers?language=" + java))
+//                .andDo(print())
+//                .andReturn();
+//
+//        assertEquals(200, mvcResult.getResponse().getStatus());
+
     }
 }
