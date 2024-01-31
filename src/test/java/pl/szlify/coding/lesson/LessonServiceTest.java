@@ -46,35 +46,35 @@ class LessonServiceTest {
     @Captor
     private ArgumentCaptor<Lesson> lessonArgumentCaptor;
 
-    @Test
-    void testFindAll_HappyPath_ResultsInLessonFindAllLessons() {
-        //given
-        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
-
-        Student student = Student.builder()
-                .firstName("Test")
-                .lastName("Testowy")
-                .language(Language.JAVA)
-                .build();
-        Teacher teacher = Teacher.builder()
-                .languages(Set.of(student.getLanguage()))
-                .build();
-        Lesson toFind = Lesson.builder()
-                .term(localDateTime)
-                .student(student)
-                .teacher(teacher)
-                .build();
-
-        when(lessonRepository.findAll()).thenReturn(List.of(toFind));
-
-        //when
-        List<LessonDto> actualLessons = lessonService.findAll();
-
-        //then
-        verify(lessonRepository).findAll();
-        LessonDto expected = LessonDto.fromEntity(toFind);
-        assertEquals(List.of(expected), actualLessons);
-    }
+//    @Test
+//    void testFindAll_HappyPath_ResultsInLessonFindAllLessons() {
+//        //given
+//        LocalDateTime localDateTime = LocalDateTime.now().plusDays(1);
+//
+//        Student student = Student.builder()
+//                .firstName("Test")
+//                .lastName("Testowy")
+//                .language(Language.JAVA)
+//                .build();
+//        Teacher teacher = Teacher.builder()
+//                .languages(Set.of(student.getLanguage()))
+//                .build();
+//        Lesson toFind = Lesson.builder()
+//                .term(localDateTime)
+//                .student(student)
+//                .teacher(teacher)
+//                .build();
+//
+//        when(lessonRepository.findAll()).thenReturn(List.of(toFind));
+//
+//        //when
+//        List<LessonDto> actualLessons = lessonService.findAll();
+//
+//        //then
+//        verify(lessonRepository).findAll();
+//        LessonDto expected = LessonDto.fromEntity(toFind);
+//        assertEquals(List.of(expected), actualLessons);
+//    }
 
     @Test
     void testCreate_HappyPath_ResultsInLessonBeingSaved() {

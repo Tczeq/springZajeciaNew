@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.szlify.coding.common.Language;
@@ -15,14 +17,18 @@ import pl.szlify.coding.teacher.model.Teacher;
 import pl.szlify.coding.teacher.model.command.CreateTeacherCommand;
 import pl.szlify.coding.teacher.model.command.UpdateTeacherCommand;
 
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static pl.szlify.coding.common.Language.JAVA;
+import static pl.szlify.coding.common.Language.PYTHON;
 
 /*
   Takie dodanie w nawiasie wevEnvironment sprawia ze
@@ -32,12 +38,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Sql(scripts = "classpath:teacher_test_cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class TeacherControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private MockRestServiceServer serviceServer;
 
     @Autowired
     private TeacherRepository teacherRepository;
@@ -47,7 +53,7 @@ class TeacherControllerTest {
         Teacher teacher = Teacher.builder()
                 .firstName("Test")
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
         Teacher teacher2 = Teacher.builder()
                 .firstName("Test2")
@@ -60,7 +66,6 @@ class TeacherControllerTest {
         mockMvc.perform(get("/api/v1/teachers"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        //todo: jsonPath
     }
 
     @Test
@@ -68,7 +73,7 @@ class TeacherControllerTest {
         Teacher teacher = Teacher.builder()
                 .firstName("Test")
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
         teacherRepository.save(teacher);
 
@@ -77,9 +82,10 @@ class TeacherControllerTest {
         mockMvc.perform(get("/api/v1/teachers/" + teacherId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", Matchers.is(teacherId)))
-                .andExpect(jsonPath("$.firstName", Matchers.is("Test")))
-                .andExpect(jsonPath("$.lastName", Matchers.is("Testowy")));
+                .andExpect(jsonPath("$.id", is(teacherId)))
+                .andExpect(jsonPath("$.firstName", is("Test")))
+                .andExpect(jsonPath("$.lastName", is("Testowy")))
+                .andExpect(jsonPath("$.languages", containsInAnyOrder(JAVA.name(), PYTHON.name())));
     }
 
     @Test
@@ -87,18 +93,23 @@ class TeacherControllerTest {
         CreateTeacherCommand command = CreateTeacherCommand.builder()
                 .firstName("Test")
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         String jsonCommand = new ObjectMapper().writeValueAsString(command);
+
+        assertTrue(teacherRepository.findById(1).isEmpty());
 
         mockMvc.perform(post("/api/v1/teachers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCommand))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName", Matchers.is("Test")))
-                .andExpect(jsonPath("$.lastName", Matchers.is("Testowy")));
+                .andExpect(jsonPath("$.firstName", is("Test")))
+                .andExpect(jsonPath("$.lastName", is("Testowy")))
+                .andExpect(jsonPath("$.languages", containsInAnyOrder(JAVA.name(), PYTHON.name())));
+
+        assertTrue(teacherRepository.findById(1).isPresent());
     }
 
     @Test
@@ -106,7 +117,7 @@ class TeacherControllerTest {
         CreateTeacherCommand command = CreateTeacherCommand.builder()
                 .firstName("test")
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         String jsonCommand = new ObjectMapper().writeValueAsString(command);
@@ -117,15 +128,15 @@ class TeacherControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").exists())
-                .andExpect(jsonPath("$.violations[0].field", Matchers.is("firstName")))
-                .andExpect(jsonPath("$.violations[0].message", Matchers.is("The name must begin with a capital letter and contain from 1 to 50 letters.")));
+                .andExpect(jsonPath("$.violations[0].field", is("firstName")))
+                .andExpect(jsonPath("$.violations[0].message", is("The name must begin with a capital letter and contain from 1 to 50 letters.")));
     }
 
     @Test
     void testCreate_teacherNotSaved_ResultsFirstNameNull() throws Exception {
         CreateTeacherCommand command = CreateTeacherCommand.builder()
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         String jsonCommand = new ObjectMapper().writeValueAsString(command);
@@ -136,8 +147,8 @@ class TeacherControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").exists())
-                .andExpect(jsonPath("$.violations[0].field", Matchers.is("firstName")))
-                .andExpect(jsonPath("$.violations[0].message", Matchers.is("firstname is mandatory")));
+                .andExpect(jsonPath("$.violations[0].field", is("firstName")))
+                .andExpect(jsonPath("$.violations[0].message", is("firstname is obligatory")));
     }
 
     @Test
@@ -145,7 +156,7 @@ class TeacherControllerTest {
         CreateTeacherCommand command = CreateTeacherCommand.builder()
                 .firstName("Test")
                 .lastName("1estowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         String jsonCommand = new ObjectMapper().writeValueAsString(command);
@@ -156,15 +167,15 @@ class TeacherControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").exists())
-                .andExpect(jsonPath("$.violations[0].field", Matchers.is("lastName")))
-                .andExpect(jsonPath("$.violations[0].message", Matchers.is("The lastname must begin with a capital letter and contain from 1 to 50 letters.")));
+                .andExpect(jsonPath("$.violations[0].field", is("lastName")))
+                .andExpect(jsonPath("$.violations[0].message", is("The lastname must begin with a capital letter and contain from 1 to 50 letters.")));
     }
 
     @Test
     void testCreate_teacherNotSaved_ResultsLastNameNull() throws Exception {
         CreateTeacherCommand command = CreateTeacherCommand.builder()
                 .firstName("Test")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         String jsonCommand = new ObjectMapper().writeValueAsString(command);
@@ -175,8 +186,8 @@ class TeacherControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").exists())
-                .andExpect(jsonPath("$.violations[0].field", Matchers.is("lastName")))
-                .andExpect(jsonPath("$.violations[0].message", Matchers.is("lastname is mandatory")));
+                .andExpect(jsonPath("$.violations[0].field", is("lastName")))
+                .andExpect(jsonPath("$.violations[0].message", is("lastname is obligatory")));
     }
 
     @Test
@@ -194,23 +205,23 @@ class TeacherControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").exists())
-                .andExpect(jsonPath("$.violations[0].field", Matchers.is("languages")))
-                .andExpect(jsonPath("$.violations[0].message", Matchers.is("At least one language")));
+                .andExpect(jsonPath("$.violations[0].field", is("languages")))
+                .andExpect(jsonPath("$.violations[0].message", is("At least one language")));
     }
 
     //nie dziala
     @Test
     void testUpdate_ResultsInTeacherBeingUpdated() throws Exception {
         UpdateTeacherCommand command = UpdateTeacherCommand.builder()
-                .firstName("UpdateName")
-                .lastName("UpdateLastName")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .firstName("Updatename")
+                .lastName("Updatelastname")
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         Teacher teacher = Teacher.builder()
                 .firstName("Test")
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
 
         teacherRepository.save(teacher);
@@ -223,9 +234,10 @@ class TeacherControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCommand))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", Matchers.is(teacherId)))
-                .andExpect(jsonPath("$.firstName", Matchers.is("UpdateName")))
-                .andExpect(jsonPath("$.lastName", Matchers.is("UpdateLastName")));
+                .andExpect(jsonPath("$.id", is(teacherId)))
+                .andExpect(jsonPath("$.firstName", is("Updatename")))
+                .andExpect(jsonPath("$.lastName", is("Updatelastname")))
+                .andExpect(jsonPath("$.languages", containsInAnyOrder(JAVA.name(), PYTHON.name())));
 
     }
 
@@ -234,7 +246,7 @@ class TeacherControllerTest {
         Teacher teacher = Teacher.builder()
                 .firstName("Test")
                 .lastName("Testowy")
-                .languages(Set.of(Language.JAVA, Language.PYTHON))
+                .languages(Set.of(JAVA, PYTHON))
                 .build();
         teacherRepository.save(teacher);
 
@@ -251,11 +263,11 @@ class TeacherControllerTest {
 
     @Test
     void testGetAllLanguages_ResultsInTeacherGotAllLanguages() throws Exception {
-        Language java = Language.JAVA;
+        Language java = JAVA;
         Teacher teacher = Teacher.builder()
                 .firstName("Test")
                 .lastName("Testowy")
-                .languages(Set.of(java, Language.PYTHON))
+                .languages(Set.of(java, PYTHON))
                 .build();
         Teacher teacher2 = Teacher.builder()
                 .firstName("Test2")
@@ -265,7 +277,7 @@ class TeacherControllerTest {
         Teacher teacher3 = Teacher.builder()
                 .firstName("Test3")
                 .lastName("Testowy3")
-                .languages(Set.of(Language.C, Language.PYTHON))
+                .languages(Set.of(Language.C, PYTHON))
                 .build();
 
         teacherRepository.save(teacher);
